@@ -56,6 +56,11 @@ This virtual trading platform simulates a complete stock trading ecosystem where
 - **CORS** - Cross-origin resource sharing
 - **dotenv** - Environment variable management
 
+**Security Packages:**
+- **Helmet** - Security headers middleware (XSS, clickjacking, MIME sniffing protection)
+- **express-rate-limit** - Rate limiting to prevent brute-force attacks
+- **cookie-parser** - Secure cookie parsing for authentication tokens
+
 ### Frontend (Landing Page)
 
 - **React 19.2.0** - UI library
@@ -312,13 +317,16 @@ You need to run all three applications simultaneously:
 For production deployments:
 
 **Backend:**
+
 ```bash
 cd backend
 npm start
 ```
+
 Runs without Nodemon for production stability
 
 **Frontend:**
+
 ```bash
 cd frontend
 npm run build
@@ -326,6 +334,7 @@ npm run build
 ```
 
 **Dashboard:**
+
 ```bash
 cd dashboard
 npm run build
@@ -396,6 +405,48 @@ npm run build
 5. User redirected to **Dashboard** with authenticated session
 6. Dashboard makes authenticated requests to Backend API
 7. Backend middleware verifies JWT for protected routes
+
+## 🛡️ Security
+
+The backend implements multiple security layers to protect against common vulnerabilities:
+
+### Security Packages
+
+**Helmet** - Secures Express apps by setting various HTTP headers:
+- Protects against XSS (Cross-Site Scripting) attacks
+- Prevents clickjacking with frameguard
+- Disables X-Powered-By header to hide Express usage
+- Implements Content Security Policy (CSP)
+- Mitigates MIME type sniffing
+
+**express-rate-limit** - Prevents brute-force attacks:
+- Limits repeated requests to API endpoints
+- Configurable rate limits per IP address
+- Protects authentication routes from credential stuffing
+- Reduces risk of DDoS attacks
+
+**cookie-parser** - Secure cookie handling:
+- Parses HTTP-only cookies for JWT storage
+- Prevents client-side JavaScript access to tokens
+- Supports signed cookies for additional security
+- Essential for secure session management
+
+**Additional Security Measures:**
+- Password hashing with bcrypt (10+ salt rounds)
+- JWT tokens with configurable expiration
+- CORS configuration with allowed origins
+- Environment-based security settings
+- MongoDB connection string protection via .env files
+
+### Best Practices Implemented
+
+✅ HTTP-only cookies for token storage
+✅ Secure password hashing (bcrypt)
+✅ Environment variable protection
+✅ CORS restrictions
+✅ Rate limiting on API endpoints
+✅ Security headers via Helmet
+✅ Input validation and sanitization
 
 ## 🧪 Testing
 
