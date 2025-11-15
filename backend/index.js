@@ -8,8 +8,6 @@ const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 
 const { HoldingsModel } = require("./model/HoldingsModel");
-const { PositionsModel } = require("./model/PositionsModel");
-
 const { OrdersModel } = require("./model/OrdersModel");
 const authRoutes = require("./src/routes/authRoutes");
 
@@ -280,15 +278,8 @@ app.get("/holdings/:symbol", async (req, res) => {
   }
 });
 
-app.get("/allPositions", async (req, res) => {
-  try {
-    const allPostions = await PositionsModel.find({});
-    res.json(allPostions);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Failed to fetch positions" });
-  }
-});
+// Note: Positions feature is planned for future implementation
+// This will track intraday and active trading positions separate from long-term holdings
 
 app.post("/newOrder", async (req, res) => {
   const { name, qty, price, mode } = req.body;
@@ -338,7 +329,7 @@ app.post("/newOrder", async (req, res) => {
 app.use((err, req, res, next) => {
   console.error("Unhandled error", err);
   const status = err.status || 500;
-  
+
   // Return standardized JSON error format
   res.status(status).json({
     success: false,

@@ -57,6 +57,7 @@ This virtual trading platform simulates a complete stock trading ecosystem where
 - **dotenv** - Environment variable management
 
 **Security Packages:**
+
 - **Helmet** - Security headers middleware (XSS, clickjacking, MIME sniffing protection)
 - **express-rate-limit** - Rate limiting to prevent brute-force attacks
 - **cookie-parser** - Secure cookie parsing for authentication tokens
@@ -137,8 +138,9 @@ The backend handles all server-side operations including:
 - `GET /api/auth/profile` - Get user profile
 - `GET /allHoldings` - Fetch all holdings
 - `GET /holdings/:symbol` - Fetch specific holding
-- `GET /allPositions` - Fetch all positions
 - `POST /newOrder` - Place new order (buy/sell)
+
+> **Note**: Positions tracking is planned for future implementation to differentiate between long-term holdings and active intraday positions.
 
 **Port**: 3002 (default)
 
@@ -150,11 +152,12 @@ The dashboard provides the core trading functionality:
 
 - Real-time portfolio overview with charts
 - Holdings management with performance metrics
-- Active positions tracking
 - Order placement interface (buy/sell windows)
 - Watchlist for monitoring stocks
 - Fund management
 - Performance visualization with graphs
+
+> **Note**: Active positions tracking feature is planned for future development to track intraday trades separately from long-term holdings.
 
 **Key Features**:
 
@@ -369,21 +372,6 @@ npm run build
 }
 ```
 
-### Positions Collection
-
-```javascript
-{
-  product: String,     // Product type (e.g., CNC)
-  name: String,        // Stock symbol
-  qty: Number,         // Quantity
-  avg: Number,         // Average price
-  price: Number,       // Current price
-  net: String,         // Net change
-  day: String,         // Day's change
-  isLoss: Boolean      // Loss indicator
-}
-```
-
 ### Orders Collection
 
 ```javascript
@@ -413,6 +401,7 @@ The backend implements multiple security layers to protect against common vulner
 ### Security Packages
 
 **Helmet** - Secures Express apps by setting various HTTP headers:
+
 - Protects against XSS (Cross-Site Scripting) attacks
 - Prevents clickjacking with frameguard
 - Disables X-Powered-By header to hide Express usage
@@ -420,18 +409,21 @@ The backend implements multiple security layers to protect against common vulner
 - Mitigates MIME type sniffing
 
 **express-rate-limit** - Prevents brute-force attacks:
+
 - Limits repeated requests to API endpoints
 - Configurable rate limits per IP address
 - Protects authentication routes from credential stuffing
 - Reduces risk of DDoS attacks
 
 **cookie-parser** - Secure cookie handling:
+
 - Parses HTTP-only cookies for JWT storage
 - Prevents client-side JavaScript access to tokens
 - Supports signed cookies for additional security
 - Essential for secure session management
 
 **Additional Security Measures:**
+
 - Password hashing with bcrypt (10+ salt rounds)
 - JWT tokens with configurable expiration
 - CORS configuration with allowed origins
@@ -557,13 +549,14 @@ The backend supports multiple origins for development:
 
 ✅ User authentication (register/login/logout)
 ✅ Holdings management and display
-✅ Positions tracking
 ✅ Order placement (buy/sell)
 ✅ Portfolio overview
 ✅ Real-time data display
 ✅ Charts and visualizations
 ✅ Responsive design
 ✅ Protected routes
+✅ Security middleware (Helmet, rate limiting)
+✅ Password validation and hashing
 
 ### In Progress
 
@@ -574,6 +567,7 @@ The backend supports multiple origins for development:
 
 ### Planned Features
 
+📋 **Positions Tracking** - Separate intraday/active positions from long-term holdings
 📋 Real-time market data simulation
 📋 Watchlist with price alerts
 📋 Portfolio performance analytics

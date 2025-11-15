@@ -20,12 +20,12 @@ function validateEmail(email) {
   if (!email || typeof email !== "string") {
     return { valid: false, message: "Email is required" };
   }
-  
+
   const trimmedEmail = email.trim();
   if (!EMAIL_REGEX.test(trimmedEmail)) {
     return { valid: false, message: "Invalid email format" };
   }
-  
+
   return { valid: true, email: trimmedEmail.toLowerCase() };
 }
 
@@ -56,10 +56,16 @@ function validatePassword(password) {
   }
 
   if (PASSWORD_REQUIREMENTS.requireNumber && !/\d/.test(password)) {
-    return { valid: false, message: "Password must contain at least one number" };
+    return {
+      valid: false,
+      message: "Password must contain at least one number",
+    };
   }
 
-  if (PASSWORD_REQUIREMENTS.requireSpecialChar && !/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+  if (
+    PASSWORD_REQUIREMENTS.requireSpecialChar &&
+    !/[!@#$%^&*(),.?":{}|<>]/.test(password)
+  ) {
     return {
       valid: false,
       message: "Password must contain at least one special character",
@@ -76,7 +82,10 @@ function validateFullName(fullName) {
 
   const trimmedName = fullName.trim();
   if (trimmedName.length < 2) {
-    return { valid: false, message: "Full name must be at least 2 characters long" };
+    return {
+      valid: false,
+      message: "Full name must be at least 2 characters long",
+    };
   }
 
   if (trimmedName.length > 80) {
