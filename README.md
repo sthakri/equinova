@@ -161,6 +161,25 @@ The dashboard provides the core trading functionality:
 
 **Port**: 3000 (default)
 
+## ⚡ Quick Start
+
+For the impatient, here's the fastest way to get running:
+
+```bash
+# Terminal 1 - Backend
+cd backend && npm install && cp .env.example .env && npm run dev
+
+# Terminal 2 - Frontend
+cd frontend && npm install && cp .env.example .env && npm run dev
+
+# Terminal 3 - Dashboard
+cd dashboard && npm install && cp .env.example .env && npm run dev
+```
+
+**Important**: Edit `backend/.env` to set your `MONGO_URL` and `JWT_SECRET` before starting the backend.
+
+---
+
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -188,11 +207,13 @@ The dashboard provides the core trading functionality:
    ```
 
    Create a `.env` file by copying the example:
+
    ```bash
    cp .env.example .env
    ```
 
    Then edit `.env` and configure the following required variables:
+
    - `MONGO_URL` - Your MongoDB connection string
    - `JWT_SECRET` - Generate a strong secret key
    - Other variables can use default values for local development
@@ -205,6 +226,7 @@ The dashboard provides the core trading functionality:
    ```
 
    Create a `.env` file by copying the example:
+
    ```bash
    cp .env.example .env
    ```
@@ -212,46 +234,103 @@ The dashboard provides the core trading functionality:
    The default values in `.env.example` work for local development.
 
 4. **Dashboard Setup**
+
    ```bash
    cd dashboard
    npm install
    ```
 
    Create a `.env` file by copying the example:
+
    ```bash
    cp .env.example .env
    ```
 
    The default values in `.env.example` work for local development.
 
+### Available Scripts
+
+Each application has the following npm scripts:
+
+#### Backend Scripts
+
+- `npm run dev` - Start development server with auto-restart (Nodemon)
+- `npm start` - Start production server
+- `npm test` - Run tests (not yet implemented)
+
+#### Frontend Scripts
+
+- `npm run dev` - Start development server with hot reload (alias for `start`)
+- `npm start` - Start development server on port 3001
+- `npm run build` - Create optimized production build
+- `npm test` - Run test suite in watch mode
+- `npm run eject` - Eject from Create React App (one-way operation)
+
+#### Dashboard Scripts
+
+- `npm run dev` - Start development server with hot reload (alias for `start`)
+- `npm start` - Start development server on port 3000
+- `npm run build` - Create optimized production build
+- `npm test` - Run test suite in watch mode
+- `npm run eject` - Eject from Create React App (one-way operation)
+
 ### Running the Application
 
 You need to run all three applications simultaneously:
+
+#### Development Mode (Recommended)
 
 1. **Start Backend** (Terminal 1)
 
    ```bash
    cd backend
-   npm start
+   npm run dev
    ```
 
-   Server will run on http://localhost:3002
+   Server will run on http://localhost:3002 with auto-restart on file changes (via Nodemon)
 
 2. **Start Frontend** (Terminal 2)
 
    ```bash
    cd frontend
-   npm start
+   npm run dev
    ```
 
-   Landing page will run on http://localhost:3001
+   Landing page will run on http://localhost:3001 with hot reload
 
 3. **Start Dashboard** (Terminal 3)
+
    ```bash
    cd dashboard
-   npm start
+   npm run dev
    ```
-   Trading dashboard will run on http://localhost:3000
+
+   Trading dashboard will run on http://localhost:3000 with hot reload
+
+#### Production Mode
+
+For production deployments:
+
+**Backend:**
+```bash
+cd backend
+npm start
+```
+Runs without Nodemon for production stability
+
+**Frontend:**
+```bash
+cd frontend
+npm run build
+# Serve the build folder with a static file server
+```
+
+**Dashboard:**
+```bash
+cd dashboard
+npm run build
+# Serve the build folder with a static file server
+```
 
 ## 📊 Database Schema
 
@@ -349,6 +428,7 @@ The backend supports multiple origins for development:
 #### Backend (`backend/.env`)
 
 **Server Configuration:**
+
 - `NODE_ENV` - Environment mode (`development`, `production`, or `test`)
   - Affects error messages, logging verbosity, and CORS behavior
   - Default: `development`
@@ -357,12 +437,14 @@ The backend supports multiple origins for development:
   - Production: Set via hosting platform
 
 **Database Configuration:**
+
 - `MONGO_URL` - MongoDB connection string
   - Local: `mongodb://localhost:27017/trading-platform`
   - Atlas: `mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<database>?appName=<AppName>`
   - Required for database connectivity
 
 **Authentication:**
+
 - `JWT_SECRET` - Secret key for JWT token signing and verification
   - **CRITICAL**: Use a strong, random string (minimum 32 characters)
   - Generate with: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
@@ -372,6 +454,7 @@ The backend supports multiple origins for development:
   - Leave empty for localhost development
 
 **CORS Configuration:**
+
 - `FRONTEND_URL` - Frontend landing page URL
   - Development: `http://localhost:3001`
   - Production: `https://yourdomain.com`
@@ -384,6 +467,7 @@ The backend supports multiple origins for development:
   - Leave empty if only using FRONTEND_URL and DASHBOARD_URL
 
 **Price Update Configuration:**
+
 - `PRICE_UPDATE_INTERVAL_MS` - Stock price update interval in milliseconds
   - Development: `5000` (5 seconds) for faster testing
   - Production: `30000-60000` (30-60 seconds) recommended
@@ -392,6 +476,7 @@ The backend supports multiple origins for development:
 #### Frontend (`frontend/.env`)
 
 **API Configuration:**
+
 - `REACT_APP_API_BASE_URL` - Backend API base URL
   - Development: `http://localhost:3002`
   - Production: `https://api.yourdomain.com`
@@ -401,6 +486,7 @@ The backend supports multiple origins for development:
 #### Dashboard (`dashboard/.env`)
 
 **API Configuration:**
+
 - `REACT_APP_API_BASE_URL` - Backend API base URL for REST endpoints
   - Development: `http://localhost:3002`
   - Production: `https://api.yourdomain.com`
