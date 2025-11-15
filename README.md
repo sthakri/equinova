@@ -187,17 +187,15 @@ The dashboard provides the core trading functionality:
    npm install
    ```
 
-   Create a `.env` file in the backend directory:
-
-   ```env
-   PORT=3002
-   MONGO_URL=mongodb://localhost:27017/trading-platform
-   JWT_SECRET=your-secret-key-here
-   NODE_ENV=development
-   DASHBOARD_URL=http://localhost:3000
-   FRONTEND_URL=http://localhost:3001
-   CORS_ORIGINS=
+   Create a `.env` file by copying the example:
+   ```bash
+   cp .env.example .env
    ```
+
+   Then edit `.env` and configure the following required variables:
+   - `MONGO_URL` - Your MongoDB connection string
+   - `JWT_SECRET` - Generate a strong secret key
+   - Other variables can use default values for local development
 
 3. **Frontend Setup**
 
@@ -206,17 +204,25 @@ The dashboard provides the core trading functionality:
    npm install
    ```
 
-   Create a `.env` file in the frontend directory:
-
-   ```env
-   REACT_APP_API_URL=http://localhost:3002
+   Create a `.env` file by copying the example:
+   ```bash
+   cp .env.example .env
    ```
+
+   The default values in `.env.example` work for local development.
 
 4. **Dashboard Setup**
    ```bash
    cd dashboard
    npm install
    ```
+
+   Create a `.env` file by copying the example:
+   ```bash
+   cp .env.example .env
+   ```
+
+   The default values in `.env.example` work for local development.
 
 ### Running the Application
 
@@ -340,19 +346,73 @@ The backend supports multiple origins for development:
 
 ### Environment Variables
 
-#### Backend (.env)
+#### Backend (`backend/.env`)
 
-- `PORT` - Server port (default: 3002)
+**Server Configuration:**
+- `NODE_ENV` - Environment mode (`development`, `production`, or `test`)
+  - Affects error messages, logging verbosity, and CORS behavior
+  - Default: `development`
+- `PORT` - Server port number
+  - Default: `3002`
+  - Production: Set via hosting platform
+
+**Database Configuration:**
 - `MONGO_URL` - MongoDB connection string
-- `JWT_SECRET` - Secret key for JWT signing
-- `NODE_ENV` - Environment (development/production)
-- `DASHBOARD_URL` - Dashboard URL for CORS and redirects
-- `FRONTEND_URL` - Frontend URL for CORS
-- `CORS_ORIGINS` - Additional allowed origins (comma-separated)
+  - Local: `mongodb://localhost:27017/trading-platform`
+  - Atlas: `mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<database>?appName=<AppName>`
+  - Required for database connectivity
 
-#### Frontend (.env)
+**Authentication:**
+- `JWT_SECRET` - Secret key for JWT token signing and verification
+  - **CRITICAL**: Use a strong, random string (minimum 32 characters)
+  - Generate with: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
+  - Never commit actual secret to version control
+- `COOKIE_DOMAIN` - Cookie domain for cross-subdomain authentication (optional)
+  - Example: `.yourdomain.com` (note the leading dot)
+  - Leave empty for localhost development
 
-- `REACT_APP_API_URL` - Backend API URL
+**CORS Configuration:**
+- `FRONTEND_URL` - Frontend landing page URL
+  - Development: `http://localhost:3001`
+  - Production: `https://yourdomain.com`
+- `DASHBOARD_URL` - Dashboard application URL
+  - Development: `http://localhost:3000`
+  - Production: `https://app.yourdomain.com` or `https://yourdomain.com/dashboard`
+  - Used for CORS and post-login redirects
+- `CORS_ORIGINS` - Additional allowed CORS origins (comma-separated)
+  - Example: `https://staging.example.com,https://app.example.com`
+  - Leave empty if only using FRONTEND_URL and DASHBOARD_URL
+
+**Price Update Configuration:**
+- `PRICE_UPDATE_INTERVAL_MS` - Stock price update interval in milliseconds
+  - Development: `5000` (5 seconds) for faster testing
+  - Production: `30000-60000` (30-60 seconds) recommended
+  - Used for simulated market data updates
+
+#### Frontend (`frontend/.env`)
+
+**API Configuration:**
+- `REACT_APP_API_BASE_URL` - Backend API base URL
+  - Development: `http://localhost:3002`
+  - Production: `https://api.yourdomain.com`
+  - Must match the backend server URL
+  - Used for all REST API requests (auth, data fetching)
+
+#### Dashboard (`dashboard/.env`)
+
+**API Configuration:**
+- `REACT_APP_API_BASE_URL` - Backend API base URL for REST endpoints
+  - Development: `http://localhost:3002`
+  - Production: `https://api.yourdomain.com`
+  - Must match the backend server URL
+  - Used for holdings, positions, orders, and user data
+- `REACT_APP_WS_URL` - WebSocket URL for real-time updates
+  - Development: `ws://localhost:3002`
+  - Production: `wss://api.yourdomain.com`
+  - Note: Use `wss://` (secure) in production
+  - **Status**: Planned for future implementation
+
+> **Security Note**: Never commit actual `.env` files to version control. Always use `.env.example` as a template with placeholder values.
 
 ## 📈 Features
 
