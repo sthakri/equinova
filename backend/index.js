@@ -4,6 +4,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 
 const { HoldingsModel } = require("./model/HoldingsModel");
 const { PositionsModel } = require("./model/PositionsModel");
@@ -35,6 +37,13 @@ const allowedOrigins = [
 
 const app = express();
 
+// Security: Hide X-Powered-By header
+app.disable("x-powered-by");
+
+// Security: Helmet middleware - must be first
+app.use(helmet());
+
+// CORS configuration with credentials support
 app.use(
   cors({
     origin(origin, callback) {
@@ -57,10 +66,25 @@ app.use(
     credentials: true,
   })
 );
+
+// Body parser and cookie parser middleware
 app.use(express.json());
 app.use(cookieParser());
 
-app.use("/api/auth", authRoutes);
+// Rate limiting for authentication routes
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // Limit each IP to 10 requests per windowMs
+  message: {
+    success: false,
+    message: "Too many authentication attempts, please try again later.",
+  },
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
+
+// Apply rate limiter to auth routes
+app.use("/api/auth", authLimiter, authRoutes);
 
 // app.get("/addHoldings", async (req, res) => {
 //   let tempHoldings = [
@@ -310,10 +334,14 @@ app.post("/newOrder", async (req, res) => {
   }
 });
 
+// Centralized error handler - must be last middleware
 app.use((err, req, res, next) => {
   console.error("Unhandled error", err);
   const status = err.status || 500;
+  
+  // Return standardized JSON error format
   res.status(status).json({
+    success: false,
     message: err.message || "Something went wrong",
     ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
   });
