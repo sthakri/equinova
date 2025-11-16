@@ -1,5 +1,6 @@
 const { UserModel } = require("../../model/UserModel");
 const { attachToken, SESSION_COOKIE } = require("../util/SecretToken");
+const WalletService = require("../services/WalletService");
 
 const DASHBOARD_HOME = process.env.DASHBOARD_URL || "http://localhost:3000";
 
@@ -163,6 +164,15 @@ const register = asyncHandler(async (req, res) => {
     email: emailValidation.email,
     password,
   });
+
+  // Initialize wallet with starting balance of $100,000
+  try {
+    await WalletService.getOrCreateWallet(user._id);
+  } catch (walletError) {
+    console.error("Failed to create wallet for user:", walletError);
+    // Wallet creation failed, but user was created - log error and continue
+    // Wallet will be created automatically on first transaction if needed
+  }
 
   // Attach JWT token to HTTP-only cookie
   attachToken(res, { id: user._id, role: user.role, email: user.email });
