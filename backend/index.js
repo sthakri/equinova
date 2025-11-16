@@ -1,6 +1,8 @@
 require("dotenv").config();
 
 const express = require("express");
+const http = require("http");
+const { Server } = require("socket.io");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
@@ -10,6 +12,9 @@ const rateLimit = require("express-rate-limit");
 const { HoldingsModel } = require("./model/HoldingsModel");
 const { OrdersModel } = require("./model/OrdersModel");
 const authRoutes = require("./src/routes/authRoutes");
+const { authenticationGuard } = require("./src/middlewares/authMiddleware");
+const WalletService = require("./src/services/WalletService");
+const MarketDataService = require("./src/services/MarketDataService");
 
 const PORT = process.env.PORT || 3002;
 const uri = process.env.MONGO_URL;
@@ -34,6 +39,84 @@ const allowedOrigins = [
 ].filter(Boolean);
 
 const app = express();
+
+// Create HTTP server wrapping Express app
+const server = http.createServer(app);
+
+// Create Socket.IO instance with CORS configuration
+const io = new Server(server, {
+  cors: {
+    origin: allowedOrigins,
+    credentials: true,
+    methods: ["GET", "POST"],
+  },
+});
+
+// Make io accessible in routes if needed
+app.set("io", io);
+
+// Store WebSocket subscriptions: socketId → symbols array
+const subscriptions = new Map();
+
+// Socket.IO connection handler
+io.on("connection", (socket) => {
+  console.log(`✅ Client connected: ${socket.id}`);
+
+  // Handle watchlist subscription
+  socket.on("subscribe_watchlist", (symbols) => {
+    if (Array.isArray(symbols) && symbols.length > 0) {
+      // Validate symbols
+      const validSymbols = symbols
+        .map((s) => s.toUpperCase().trim())
+        .filter((s) => MarketDataService.getPrice(s) !== null);
+
+      subscriptions.set(socket.id, validSymbols);
+      console.log(
+        `📊 Client ${socket.id} subscribed to: ${validSymbols.join(", ")}`
+      );
+
+      // Send initial data immediately
+      const initialData = validSymbols.map((symbol) =>
+        MarketDataService.getPrice(symbol)
+      );
+      socket.emit("watchlist_update", initialData);
+    } else {
+      console.warn(
+        `⚠️  Client ${socket.id} sent invalid subscription:`,
+        symbols
+      );
+    }
+  });
+
+  // Handle unsubscribe
+  socket.on("unsubscribe_watchlist", () => {
+    if (subscriptions.has(socket.id)) {
+      const symbols = subscriptions.get(socket.id);
+      subscriptions.delete(socket.id);
+      console.log(
+        `🔕 Client ${socket.id} unsubscribed from: ${symbols.join(", ")}`
+      );
+    }
+  });
+
+  // Handle disconnect
+  socket.on("disconnect", () => {
+    if (subscriptions.has(socket.id)) {
+      const symbols = subscriptions.get(socket.id);
+      subscriptions.delete(socket.id);
+      console.log(
+        `❌ Client ${socket.id} disconnected (was subscribed to: ${symbols.join(
+          ", "
+        )})`
+      );
+    } else {
+      console.log(`❌ Client ${socket.id} disconnected`);
+    }
+  });
+});
+
+// Export subscriptions and io for use in other modules
+app.set("subscriptions", subscriptions);
 
 // Security: Hide X-Powered-By header
 app.disable("x-powered-by");
@@ -84,173 +167,24 @@ const authLimiter = rateLimit({
 // Apply rate limiter to auth routes
 app.use("/api/auth", authLimiter, authRoutes);
 
-// app.get("/addHoldings", async (req, res) => {
-//   let tempHoldings = [
-//     {
-//       name: "BHARTIARTL",
-//       qty: 2,
-//       avg: 538.05,
-//       price: 541.15,
-//       net: "+0.58%",
-//       day: "+2.99%",
-//     },
-//     {
-//       name: "HDFCBANK",
-//       qty: 2,
-//       avg: 1383.4,
-//       price: 1522.35,
-//       net: "+10.04%",
-//       day: "+0.11%",
-//     },
-//     {
-//       name: "HINDUNILVR",
-//       qty: 1,
-//       avg: 2335.85,
-//       price: 2417.4,
-//       net: "+3.49%",
-//       day: "+0.21%",
-//     },
-//     {
-//       name: "INFY",
-//       qty: 1,
-//       avg: 1350.5,
-//       price: 1555.45,
-//       net: "+15.18%",
-//       day: "-1.60%",
-//       isLoss: true,
-//     },
-//     {
-//       name: "ITC",
-//       qty: 5,
-//       avg: 202.0,
-//       price: 207.9,
-//       net: "+2.92%",
-//       day: "+0.80%",
-//     },
-//     {
-//       name: "KPITTECH",
-//       qty: 5,
-//       avg: 250.3,
-//       price: 266.45,
-//       net: "+6.45%",
-//       day: "+3.54%",
-//     },
-//     {
-//       name: "M&M",
-//       qty: 2,
-//       avg: 809.9,
-//       price: 779.8,
-//       net: "-3.72%",
-//       day: "-0.01%",
-//       isLoss: true,
-//     },
-//     {
-//       name: "RELIANCE",
-//       qty: 1,
-//       avg: 2193.7,
-//       price: 2112.4,
-//       net: "-3.71%",
-//       day: "+1.44%",
-//     },
-//     {
-//       name: "SBIN",
-//       qty: 4,
-//       avg: 324.35,
-//       price: 430.2,
-//       net: "+32.63%",
-//       day: "-0.34%",
-//       isLoss: true,
-//     },
-//     {
-//       name: "SGBMAY29",
-//       qty: 2,
-//       avg: 4727.0,
-//       price: 4719.0,
-//       net: "-0.17%",
-//       day: "+0.15%",
-//     },
-//     {
-//       name: "TATAPOWER",
-//       qty: 5,
-//       avg: 104.2,
-//       price: 124.15,
-//       net: "+19.15%",
-//       day: "-0.24%",
-//       isLoss: true,
-//     },
-//     {
-//       name: "TCS",
-//       qty: 1,
-//       avg: 3041.7,
-//       price: 3194.8,
-//       net: "+5.03%",
-//       day: "-0.25%",
-//       isLoss: true,
-//     },
-//     {
-//       name: "WIPRO",
-//       qty: 4,
-//       avg: 489.3,
-//       price: 577.75,
-//       net: "+18.08%",
-//       day: "+0.32%",
-//     },
-//   ];
+app.get("/allHoldings", async (req, res) => {
+  try {
+    const allHoldings = await HoldingsModel.find({});
+    res.json(allHoldings);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to fetch holdings" });
+  }
+});
 
 //   tempHoldings.forEach((item) => {
 //     let newHolding = new HoldingsModel({
-//       name: item.name,
-//       qty: item.qty,
-//       avg: item.avg,
-//       price: item.price,
-//       net: item.net,
-//       day: item.day,
-//     });
 //     newHolding.save();
-//   });
-//   res.send("Done!");
-// });
-
-// app.get("/addPositions", async (req, res) => {
-//   let tempPositions = [
-//     {
-//       product: "CNC",
-//       name: "EVEREADY",
-//       qty: 2,
-//       avg: 316.27,
-//       price: 312.35,
-//       net: "+0.58%",
-//       day: "-1.24%",
-//       isLoss: true,
-//     },
-//     {
-//       product: "CNC",
-//       name: "JUBLFOOD",
-//       qty: 1,
-//       avg: 3124.75,
-//       price: 3082.65,
-//       net: "+10.04%",
-//       day: "-1.35%",
-//       isLoss: true,
-//     },
-//   ];
 
 //   tempPositions.forEach((item) => {
 //     let newPosition = new PositionsModel({
-//       product: item.product,
-//       name: item.name,
-//       qty: item.qty,
-//       avg: item.avg,
-//       price: item.price,
-//       net: item.net,
-//       day: item.day,
-//       isLoss: item.isLoss,
-//     });
 
 //     newPosition.save();
-//   });
-//   res.send("Done!");
-// });
 
 app.get("/allHoldings", async (req, res) => {
   try {
@@ -280,6 +214,195 @@ app.get("/holdings/:symbol", async (req, res) => {
 
 // Note: Positions feature is planned for future implementation
 // This will track intraday and active trading positions separate from long-term holdings
+
+// Market Data API endpoints (Public - No Auth Required)
+
+// GET /api/market/prices?symbols=INFY,TCS,WIPRO
+// Returns prices for specific symbols or all if no query param
+app.get("/api/market/prices", (req, res) => {
+  try {
+    const { symbols } = req.query;
+
+    if (symbols) {
+      // Filter by requested symbols
+      const symbolArray = symbols.split(",").map((s) => s.trim().toUpperCase());
+      const prices = [];
+      const notFound = [];
+
+      symbolArray.forEach((symbol) => {
+        const priceData = MarketDataService.getPrice(symbol);
+        if (priceData) {
+          prices.push(priceData);
+        } else {
+          notFound.push(symbol);
+        }
+      });
+
+      return res.json({
+        success: true,
+        data: prices,
+        count: prices.length,
+        ...(notFound.length > 0 && { notFound }),
+      });
+    }
+
+    // Return all prices if no filter
+    const prices = MarketDataService.getAllPrices();
+    res.json({
+      success: true,
+      data: prices,
+      count: prices.length,
+    });
+  } catch (error) {
+    console.error("Error fetching market prices:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch market prices",
+    });
+  }
+});
+
+// GET /api/market/price/:symbol
+// Returns current price data for a single symbol
+app.get("/api/market/price/:symbol", (req, res) => {
+  try {
+    const { symbol } = req.params;
+    const priceData = MarketDataService.getPrice(symbol);
+
+    if (!priceData) {
+      return res.status(404).json({
+        success: false,
+        message: `Symbol ${symbol.toUpperCase()} not found`,
+        availableSymbols: MarketDataService.getSymbols(),
+      });
+    }
+
+    res.json({
+      success: true,
+      data: priceData,
+    });
+  } catch (error) {
+    console.error("Error fetching price:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch price",
+    });
+  }
+});
+
+// GET /api/market/all
+// Returns all available symbols with complete market data
+app.get("/api/market/all", (req, res) => {
+  try {
+    const prices = MarketDataService.getAllPrices();
+    const symbols = MarketDataService.getSymbols();
+
+    res.json({
+      success: true,
+      data: prices,
+      symbols: symbols,
+      count: prices.length,
+      lastUpdated: new Date(),
+    });
+  } catch (error) {
+    console.error("Error fetching all market data:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch market data",
+    });
+  }
+});
+
+// GET /api/market/symbols
+// Returns list of all available symbol names
+app.get("/api/market/symbols", (req, res) => {
+  try {
+    const symbols = MarketDataService.getSymbols();
+    res.json({
+      success: true,
+      data: symbols,
+      count: symbols.length,
+    });
+  } catch (error) {
+    console.error("Error fetching symbols:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch symbols",
+    });
+  }
+});
+
+app.get("/api/market/watchlist", (req, res) => {
+  try {
+    const watchlist = MarketDataService.getWatchlistPrices();
+    res.json({
+      success: true,
+      data: watchlist,
+      count: watchlist.length,
+    });
+  } catch (error) {
+    console.error("Error fetching watchlist:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch watchlist",
+    });
+  }
+});
+
+app.post("/api/market/reset", (req, res) => {
+  try {
+    const prices = MarketDataService.resetAllPrices();
+    res.json({
+      success: true,
+      message: "All prices reset to base values",
+      data: prices,
+    });
+  } catch (error) {
+    console.error("Error resetting prices:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to reset prices",
+    });
+  }
+});
+
+// Wallet API endpoints
+app.get("/api/wallet/balance", authenticationGuard, async (req, res) => {
+  try {
+    const balance = await WalletService.getBalance(req.user._id);
+    res.json({
+      success: true,
+      balance,
+      currency: "USD",
+    });
+  } catch (error) {
+    console.error("Error fetching balance:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch wallet balance",
+    });
+  }
+});
+
+app.get("/api/wallet/transactions", authenticationGuard, async (req, res) => {
+  try {
+    const transactions = await WalletService.getTransactionHistory(
+      req.user._id,
+      50
+    );
+    res.json({
+      success: true,
+      transactions,
+      count: transactions.length,
+    });
+  } catch (error) {
+    console.error("Error fetching transactions:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch transaction history",
+    });
+  }
+});
 
 app.post("/newOrder", async (req, res) => {
   const { name, qty, price, mode } = req.body;
@@ -340,14 +463,25 @@ app.use((err, req, res, next) => {
 
 async function startServer() {
   try {
-    await mongoose.connect(uri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    await mongoose.connect(uri);
     console.log("dbConnected");
 
-    app.listen(PORT, () => {
+    // Connect MarketDataService to WebSocket server
+    MarketDataService.setSocketIO(io, subscriptions);
+
+    // Start market data auto-update with configurable interval
+    const updateInterval =
+      parseInt(process.env.PRICE_UPDATE_INTERVAL_MS) || 60000;
+    console.log(
+      `Starting price update scheduler with ${updateInterval}ms interval (${
+        updateInterval / 1000
+      }s)`
+    );
+    MarketDataService.startAutoUpdate(updateInterval);
+
+    server.listen(PORT, () => {
       console.log(`Server listening on port ${PORT}`);
+      console.log(`WebSocket server ready on port ${PORT}`);
     });
   } catch (error) {
     console.error("Failed to connect to MongoDB", error);

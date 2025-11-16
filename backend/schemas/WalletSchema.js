@@ -49,7 +49,6 @@ const WalletSchema = new Schema(
       ref: "User",
       required: [true, "User ID is required"],
       unique: true,
-      index: true,
     },
     balance: {
       type: Number,
@@ -73,9 +72,6 @@ const WalletSchema = new Schema(
     timestamps: true, // Adds createdAt and updatedAt automatically
   }
 );
-
-// Index for faster queries
-WalletSchema.index({ userId: 1 });
 
 // Virtual for total transactions count
 WalletSchema.virtual("transactionCount").get(function () {
