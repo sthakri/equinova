@@ -8,14 +8,34 @@
   "scripts": {
     "dev": "nodemon index.js",
     "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --verbose --coverage",
+    "test:watch": "jest --watch",
+    "test:single": "jest",
+    "smoke-test": "node scripts/smokeTest.js"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": ["/node_modules/"],
+    "testMatch": ["**/test/**/*.test.js"],
+    "setupFilesAfterEnv": ["./test/setup.js"],
+    "maxWorkers": 1,
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "model/**/*.js",
+      "!src/jobs/**",
+      "!src/lib/**"
+    ]
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "jest": "^30.2.0",
     "nodemon": "^3.1.10",
-    "socket.io-client": "^4.8.1"
+    "pino-pretty": "^13.0.0",
+    "socket.io-client": "^4.8.1",
+    "supertest": "^7.1.4"
   },
   "dependencies": {
     "axios": "^1.13.2",
@@ -32,6 +52,8 @@
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
     "passport-local-mongoose": "^8.0.0",
+    "pino": "^9.5.0",
+    "pino-http": "^10.3.0",
     "socket.io": "^4.8.1"
   }
 }

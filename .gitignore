@@ -49,3 +49,10 @@ coverage/
 *.pid
 *.seed
 *.pid.lock
+
+# Python (if any scripts are added)
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.so

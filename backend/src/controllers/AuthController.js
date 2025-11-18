@@ -1,4 +1,5 @@
 const { UserModel } = require("../../model/UserModel");
+const baseLogger = require("../util/logger");
 const { attachToken, SESSION_COOKIE } = require("../util/SecretToken");
 const WalletService = require("../services/WalletService");
 
@@ -169,13 +170,24 @@ const register = asyncHandler(async (req, res) => {
   try {
     await WalletService.getOrCreateWallet(user._id);
   } catch (walletError) {
-    console.error("Failed to create wallet for user:", walletError);
+    const logger = typeof req !== "undefined" && req.log ? req.log : baseLogger;
+    logger.error(
+      { err: walletError, userId: user._id.toString() },
+      "Failed to create wallet for user"
+    );
     // Wallet creation failed, but user was created - log error and continue
     // Wallet will be created automatically on first transaction if needed
   }
 
   // Attach JWT token to HTTP-only cookie
   attachToken(res, { id: user._id, role: user.role, email: user.email });
+
+  // Log auth success
+  const logger = typeof req !== "undefined" && req.log ? req.log : baseLogger;
+  logger.info(
+    { userId: user._id.toString(), email: user.email },
+    "Signup successful"
+  );
 
   // Return minimal user info (never password)
   return res.status(201).json({
@@ -208,6 +220,11 @@ const login = asyncHandler(async (req, res) => {
   // Find user by normalized email
   const user = await UserModel.findOne({ email: emailValidation.email });
   if (!user) {
+    const logger = typeof req !== "undefined" && req.log ? req.log : baseLogger;
+    logger.warn(
+      { email: emailValidation.email },
+      "Login failed: user not found"
+    );
     return res.status(401).json({
       success: false,
       message: "Invalid email or password",
@@ -217,6 +234,8 @@ const login = asyncHandler(async (req, res) => {
   // Compare password using bcrypt (hashed comparison)
   const isMatch = await user.comparePassword(password);
   if (!isMatch) {
+    const logger = typeof req !== "undefined" && req.log ? req.log : baseLogger;
+    logger.warn({ userId: user._id.toString() }, "Login failed: bad password");
     return res.status(401).json({
       success: false,
       message: "Invalid email or password",
@@ -225,6 +244,10 @@ const login = asyncHandler(async (req, res) => {
 
   // Attach JWT token to HTTP-only cookie
   attachToken(res, { id: user._id, role: user.role, email: user.email });
+
+  // Log success
+  const logger = typeof req !== "undefined" && req.log ? req.log : baseLogger;
+  logger.info({ userId: user._id.toString() }, "Login successful");
 
   // Return minimal user info (never password)
   return res.json({
@@ -236,11 +259,29 @@ const login = asyncHandler(async (req, res) => {
 });
 
 const logout = asyncHandler(async (req, res) => {
-  res.clearCookie(SESSION_COOKIE, {
+  const isProduction = process.env.NODE_ENV === "production";
+
+  // Clear cookie with same options used when setting it
+  const clearOptions = {
     httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-  });
+    path: "/",
+  };
+
+  // Match production settings for proper cookie clearing
+  if (isProduction) {
+    const cookieDomain = process.env.COOKIE_DOMAIN;
+    if (cookieDomain) {
+      clearOptions.domain = cookieDomain;
+    }
+    clearOptions.secure = true;
+    clearOptions.sameSite = "none";
+  } else {
+    clearOptions.secure = false;
+    clearOptions.sameSite = "lax";
+  }
+
+  res.clearCookie(SESSION_COOKIE, clearOptions);
+
   return res.json({
     success: true,
     message: "Logged out successfully",

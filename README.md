@@ -1,5 +1,19 @@
 # Trading Platform
 
+**Status:** ✅ **PRODUCTION READY** | **Version:** 1.0.0 | **Last Updated:** November 17, 2025
+
+## 🚀 Quick Start for Deployment
+
+**Ready to deploy?** Start here:
+
+1. 📖 Read **`DEPLOYMENT_GUIDE.md`** - Complete deployment instructions
+2. ✅ Check **`PRODUCTION_READINESS.md`** - Pre-deployment checklist
+3. ⚡ Use **`DEPLOYMENT_COMPLETE.md`** - Quick reference summary
+
+**For local development:** See "Getting Started" section below.
+
+---
+
 A full-stack virtual trading platform with simulated market data that enables users to practice trading without real financial risk. The platform provides a realistic trading experience with features including holdings management, order placement, and real-time portfolio tracking.
 
 ## 🎯 Project Purpose
@@ -264,7 +278,19 @@ Each application has the following npm scripts:
 
 - `npm run dev` - Start development server with auto-restart (Nodemon)
 - `npm start` - Start production server
-- `npm test` - Run tests (not yet implemented)
+- `npm test` - Run unit and integration tests with coverage
+- `npm run test:watch` - Run tests in watch mode
+- `npm run smoke-test` - Run end-to-end smoke tests
+
+### Logging (Backend)
+
+- Structured logging via `pino` with per-request `x-request-id`.
+- Dev mode uses `pino-pretty` for readable output; production emits JSON lines.
+- Configure level with `LOG_LEVEL` env var (default `info`).
+- Important events logged:
+  - Auth success/failure, CORS decisions
+  - Orders placed/failed with context (symbol, qty, price)
+  - Errors in routes and middleware with stack traces in development
 
 #### Frontend Scripts
 
@@ -442,6 +468,76 @@ The backend implements multiple security layers to protect against common vulner
 
 ## 🧪 Testing
 
+### Backend Tests
+
+#### Unit & Integration Tests
+
+```bash
+cd backend
+npm test                  # Run all tests with coverage
+npm run test:watch        # Run tests in watch mode
+```
+
+**Test Coverage:**
+
+- Authentication Controller (login, register, logout)
+- Wallet Service (balance, transactions)
+- Integration tests (full user flow)
+
+**Coverage Report:** Available in `backend/coverage/lcov-report/index.html`
+
+#### Smoke Tests (End-to-End)
+
+The smoke test validates the complete backend system by simulating a real trading workflow:
+
+```bash
+cd backend
+npm run smoke-test
+```
+
+**What it tests:**
+
+1. ✓ Server startup and health check
+2. ✓ User registration with validation
+3. ✓ User login and session management
+4. ✓ Buy order placement and processing
+5. ✓ Holdings creation and verification
+6. ✓ Wallet balance updates
+7. ✓ Transaction history recording
+8. ✓ Sell order execution
+9. ✓ Holdings cleanup after selling
+10. ✓ Order history tracking
+11. ✓ Automatic test data cleanup
+
+**Features:**
+
+- Colored console output for easy reading
+- Automatic server startup and shutdown
+- Isolated test data with cleanup
+- Step-by-step validation with detailed reporting
+- Graceful error handling with rollback
+
+**Requirements:**
+
+- MongoDB running and accessible
+- Backend `.env` file configured
+- Ports 3002 and MongoDB port available
+
+**Example output:**
+
+```
+========================================
+   BACKEND SMOKE TEST SUITE
+========================================
+
+[1/14] Starting backend server...
+✓ Server started successfully (PID: 12345)
+
+[2/14] Registering test user...
+✓ User registered: test_user_1234567890
+...
+```
+
 ### Frontend Tests
 
 ```bash
@@ -451,10 +547,31 @@ npm test
 
 ### Dashboard Tests
 
+The dashboard includes comprehensive React component tests:
+
 ```bash
 cd dashboard
-npm test
+npm test                  # Run all tests
+npm test -- --coverage    # Run with coverage report
 ```
+
+**Test Coverage:**
+
+- Holdings component (rendering, data display, calculations)
+- Funds component (wallet balance, transactions)
+- BuyActionWindow (form validation, order placement)
+- OrderInteraction (complete buy/sell flows)
+
+**What's tested:**
+
+- Component rendering with various data states
+- User interactions (clicks, form inputs, submissions)
+- API integration and error handling
+- Loading states and async operations
+- Form validation and calculations
+- WebSocket mock behavior
+
+**Test documentation:** See `dashboard/src/test/README.md`
 
 ## 🔧 Configuration
 
@@ -601,8 +718,45 @@ This project is licensed under the ISC License.
 - MongoDB for flexible data storage
 - Express.js community for excellent middleware
 
+## 📚 Additional Documentation
+
+- **[PRODUCTION_READY.md](PRODUCTION_READY.md)** - Complete production deployment guide with security checklist
+- **[DATABASE_RESET_SUMMARY.md](DATABASE_RESET_SUMMARY.md)** - Database cleanup summary and production readiness confirmation
+- **[WATCHLIST_STOCKS.md](WATCHLIST_STOCKS.md)** - Detailed information about the 15 available stocks
+- **[MARKET_DATA_SERVICE.md](MARKET_DATA_SERVICE.md)** - Market data architecture and WebSocket implementation
+- **[TEST_SUMMARY.md](backend/TEST_SUMMARY.md)** - Test coverage and validation reports
+
+## 🆕 Database Status
+
+✅ **Production Ready** - Database has been cleaned and is ready for launch
+
+The MongoDB database is completely clean with:
+
+- **0** test users
+- **0** test transactions
+- **15** stocks available for trading
+- Fresh start for production deployment
+
+For details on the database reset and production readiness, see [DATABASE_RESET_SUMMARY.md](DATABASE_RESET_SUMMARY.md).
+
+### Database Management Scripts
+
+**Clean database:**
+
+```bash
+cd backend
+node scripts/resetDatabase.js
+```
+
+**Verify database state:**
+
+```bash
+cd backend
+node scripts/verifyDatabase.js
+```
+
 ---
 
-**Last Updated**: November 15, 2025
+**Last Updated**: November 17, 2025
 
 _Note: This is a virtual trading platform for educational purposes only. No real money or securities are involved._

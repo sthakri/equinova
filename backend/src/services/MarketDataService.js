@@ -3,25 +3,71 @@
  * Simulates real-time stock price updates with random walk algorithm
  */
 
+const logger = require("../util/logger");
+
 class MarketDataService {
   constructor() {
-    // Define demo symbols with base prices (Indian stocks)
+    // Define demo symbols with base prices (US stocks)
     this.baseSymbols = {
-      INFY: 1450.0,
-      TCS: 3200.0,
-      WIPRO: 450.0,
-      HDFCBANK: 1600.0,
-      RELIANCE: 2400.0,
-      BHARTIARTL: 850.0,
-      ITC: 420.0,
-      SBIN: 580.0,
-      TATAMOTORS: 650.0,
-      ASIANPAINT: 3100.0,
-      HINDUNILVR: 2500.0,
-      MARUTI: 9500.0,
-      LT: 2800.0,
-      KOTAKBANK: 1750.0,
-      ICICIBANK: 950.0,
+      // Technology
+      AAPL: 178.5,
+      MSFT: 380.0,
+      GOOGL: 142.5,
+      AMZN: 155.75,
+      META: 485.0,
+      TSLA: 242.8,
+      NVDA: 495.0,
+      ORCL: 115.2,
+      ADBE: 560.0,
+      CRM: 285.5,
+      INTC: 42.75,
+      AMD: 145.3,
+      NFLX: 485.0,
+      AVGO: 925.0,
+      CSCO: 52.5,
+
+      // Finance
+      JPM: 162.5,
+      BAC: 34.8,
+      WFC: 48.25,
+      GS: 425.0,
+      MS: 98.5,
+      C: 58.75,
+      AXP: 195.0,
+      BLK: 785.0,
+      SCHW: 68.5,
+
+      // Healthcare
+      JNJ: 158.5,
+      UNH: 525.0,
+      PFE: 28.75,
+      ABBV: 168.5,
+      MRK: 112.25,
+      TMO: 545.0,
+      ABT: 108.5,
+      LLY: 625.0,
+
+      // Consumer
+      WMT: 168.5,
+      HD: 385.0,
+      MCD: 295.5,
+      NKE: 92.75,
+      SBUX: 98.5,
+      TGT: 145.0,
+      COST: 745.0,
+      LOW: 245.0,
+
+      // Industrial & Energy
+      BA: 182.5,
+      CAT: 345.0,
+      XOM: 112.5,
+      CVX: 158.75,
+
+      // Communication
+      DIS: 98.5,
+      CMCSA: 42.75,
+      T: 18.5,
+      VZ: 41.25,
     };
 
     // Initialize current prices with base prices
@@ -56,7 +102,7 @@ class MarketDataService {
   setSocketIO(io, subscriptions) {
     this.io = io;
     this.subscriptions = subscriptions;
-    console.log("📡 MarketDataService connected to WebSocket server");
+    logger.info("MarketDataService connected to WebSocket server");
   }
 
   /**
@@ -257,7 +303,7 @@ class MarketDataService {
       this.updateAllPrices();
     }, intervalMs);
 
-    console.log(`Market data auto-update started (interval: ${intervalMs}ms)`);
+    logger.info({ intervalMs }, "Market data auto-update started");
   }
 
   /**
@@ -267,8 +313,15 @@ class MarketDataService {
     if (this.updateInterval) {
       clearInterval(this.updateInterval);
       this.updateInterval = null;
-      console.log("Market data auto-update stopped");
+      logger.info("Market data auto-update stopped");
     }
+  }
+
+  /**
+   * Whether the market data auto-update interval is active
+   */
+  isActive() {
+    return Boolean(this.updateInterval);
   }
 
   /**

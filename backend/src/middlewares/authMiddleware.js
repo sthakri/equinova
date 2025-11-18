@@ -8,6 +8,7 @@ async function authenticationGuard(req, res, next) {
       req.headers?.authorization?.replace("Bearer ", "");
 
     if (!token) {
+      req.log?.warn({ path: req.path }, "Authentication required - no token");
       return res.status(401).json({ message: "Authentication required" });
     }
 
@@ -15,12 +16,17 @@ async function authenticationGuard(req, res, next) {
     const user = await UserModel.findById(payload.id);
 
     if (!user) {
+      req.log?.warn(
+        { path: req.path },
+        "Authentication failed - user not found"
+      );
       return res.status(401).json({ message: "Invalid session" });
     }
 
     req.user = user;
     return next();
   } catch (error) {
+    req.log?.warn({ err: error, path: req.path }, "Authentication error");
     return res.status(401).json({ message: "Invalid or expired session" });
   }
 }

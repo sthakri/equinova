@@ -22,8 +22,58 @@ class WalletService {
     return wallet.balance;
   }
 
+  // Debit amount from wallet (for BUY orders)
+  async debit(userId, amount, description = "") {
+    const wallet = await this.getOrCreateWallet(userId);
+
+    if (wallet.balance < amount) {
+      throw new Error("Insufficient balance");
+    }
+
+    const transaction = {
+      type: "DEBIT",
+      amount: -amount,
+      description,
+      balanceAfter: wallet.balance - amount,
+      timestamp: new Date(),
+    };
+
+    wallet.balance -= amount;
+    wallet.transactions.push(transaction);
+    await wallet.save();
+
+    return {
+      success: true,
+      balance: wallet.balance,
+      transaction,
+    };
+  }
+
+  // Credit amount to wallet (for SELL orders)
+  async credit(userId, amount, description = "") {
+    const wallet = await this.getOrCreateWallet(userId);
+
+    const transaction = {
+      type: "CREDIT",
+      amount: amount,
+      description,
+      balanceAfter: wallet.balance + amount,
+      timestamp: new Date(),
+    };
+
+    wallet.balance += amount;
+    wallet.transactions.push(transaction);
+    await wallet.save();
+
+    return {
+      success: true,
+      balance: wallet.balance,
+      transaction,
+    };
+  }
+
   // Process buy/sell transaction
-  async processTransaction(userId, type, amount, details) {
+  async processTransaction(userId, type, amount, details, session = null) {
     const wallet = await this.getOrCreateWallet(userId);
 
     // Validate transaction type
@@ -54,7 +104,13 @@ class WalletService {
     // Update wallet
     wallet.transactions.push(transaction);
     wallet.balance = newBalance;
-    await wallet.save();
+
+    // Save with session if provided (for MongoDB transactions)
+    if (session) {
+      await wallet.save({ session });
+    } else {
+      await wallet.save();
+    }
 
     return {
       success: true,
