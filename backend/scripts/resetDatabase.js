@@ -82,9 +82,9 @@ async function resetDatabase() {
     console.log("   • New users will start with clean state");
     console.log("");
     console.log("🚀 Next Steps:");
-    console.log("   1. Review DEPLOYMENT_GUIDE.md");
-    console.log("   2. Configure .env.production files");
-    console.log("   3. Deploy backend, dashboard, and frontend");
+    console.log("   1. Review README.md (Deployment section)");
+    console.log("   2. Configure environment variables on hosting platforms");
+    console.log("   3. Deploy backend (Render), dashboard & frontend (Vercel)");
     console.log("   4. Test complete user flow");
     console.log("");
   } catch (error) {
