@@ -30,7 +30,7 @@ frontend/     React marketing/landing site
 
 ## Installation
 
-Prerequisites: Node.js >= 16, a MongoDB connection string (Atlas recommended).
+Prerequisites: Node.js >= 18 (LTS), a MongoDB connection string (Atlas recommended).
 
 ```powershell
 # From repository root
