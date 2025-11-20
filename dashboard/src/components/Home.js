@@ -49,10 +49,6 @@ const Home = () => {
         console.error("[Auth Debug]", debugText);
         setDebugInfo(prev => prev + debugText);
 
-        const debugText = `ERROR:\n${JSON.stringify(errorDetails, null, 2)}`;
-        console.error("[Auth Debug]", debugText);
-        setDebugInfo(prev => prev + debugText);
-
         // Store error in localStorage for persistence
         localStorage.setItem("lastAuthError", debugText);
 
