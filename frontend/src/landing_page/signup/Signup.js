@@ -120,20 +120,23 @@ function Signup() {
       console.log("[Signup] Response received:", response.data);
       setSuccess(response.data?.message || "Signup successful! Redirecting...");
 
-      // Store token for dashboard authentication
-      if (response.data?.token) {
-        console.log("[Signup] Storing auth token");
-        localStorage.setItem("authToken", response.data.token);
-      } else {
-        console.warn("[Signup] No token in response");
-      }
-
-      // Redirect to dashboard
-      setTimeout(() => {
+      // Get token and pass it to dashboard via URL
+      const token = response.data?.token;
+      if (token) {
+        console.log("[Signup] Token received, redirecting to dashboard...");
         const redirectUrl = response.data?.redirectUrl || DASHBOARD_REDIRECT;
-        console.log("[Signup] Redirecting to:", redirectUrl);
-        window.location.href = redirectUrl;
-      }, 800);
+        // Pass token as URL parameter for cross-domain authentication
+        const dashboardUrl = `${redirectUrl}?token=${encodeURIComponent(token)}`;
+        console.log("[Signup] Redirecting to:", dashboardUrl);
+        
+        setTimeout(() => {
+          window.location.href = dashboardUrl;
+        }, 800);
+      } else {
+        console.error("[Signup] No token in response");
+        setError("Signup failed - no authentication token received");
+        setIsSubmitting(false);
+      }
     } catch (err) {
       console.error("[Signup] Error:", err);
       const message =

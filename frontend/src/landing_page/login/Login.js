@@ -88,19 +88,23 @@ function Login() {
       console.log("[Login] Response received:", response.data);
       setSuccess(response.data?.message || "Login successful! Redirecting...");
 
-      // Store token for dashboard authentication
-      if (response.data?.token) {
-        console.log("[Login] Storing auth token");
-        localStorage.setItem("authToken", response.data.token);
-      } else {
-        console.warn("[Login] No token in response");
-      }
-
-      setTimeout(() => {
+      // Get token and pass it to dashboard via URL
+      const token = response.data?.token;
+      if (token) {
+        console.log("[Login] Token received, redirecting to dashboard...");
         const redirectUrl = response.data?.redirectUrl || DASHBOARD_REDIRECT;
-        console.log("[Login] Redirecting to:", redirectUrl);
-        window.location.href = redirectUrl;
-      }, 400);
+        // Pass token as URL parameter for cross-domain authentication
+        const dashboardUrl = `${redirectUrl}?token=${encodeURIComponent(token)}`;
+        console.log("[Login] Redirecting to:", dashboardUrl);
+        
+        setTimeout(() => {
+          window.location.href = dashboardUrl;
+        }, 400);
+      } else {
+        console.error("[Login] No token in response");
+        setError("Login failed - no authentication token received");
+        setIsSubmitting(false);
+      }
     } catch (err) {
       console.error("[Login] Error:", err);
       const message =

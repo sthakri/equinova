@@ -12,7 +12,18 @@ const Home = () => {
     // Check authentication on mount
     const checkAuth = async () => {
       try {
-        // Log token presence
+        // First, check if token is in URL (from login/signup redirect)
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlToken = urlParams.get('token');
+        
+        if (urlToken) {
+          console.log("[Auth] Token found in URL, storing it...");
+          localStorage.setItem("authToken", urlToken);
+          // Clean up URL by removing token parameter
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+        
+        // Now get token from localStorage
         const token = localStorage.getItem("authToken");
         const tokenDebug = token ? `Token present (${token.substring(0, 20)}...)` : "NO TOKEN FOUND";
         console.log("[Auth Debug]", tokenDebug);
