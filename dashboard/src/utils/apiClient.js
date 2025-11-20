@@ -21,14 +21,15 @@ apiClient.interceptors.request.use(
     const token = localStorage.getItem("authToken");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+      console.log(`[API Request] Added Authorization header to ${config.url}`);
+      console.log(`[API Request] Token: ${token.substring(0, 20)}...`);
+    } else {
+      console.warn(`[API Request] NO TOKEN FOUND for ${config.url}`);
     }
 
-    // Log requests in development
-    if (process.env.NODE_ENV === "development") {
-      console.log(
-        `[API Request] ${config.method?.toUpperCase()} ${config.url}`
-      );
-    }
+    // Log full request details
+    console.log(`[API Request] ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`);
+    console.log(`[API Request] Headers:`, config.headers);
 
     return config;
   },
@@ -41,17 +42,22 @@ apiClient.interceptors.request.use(
 // Response interceptor - Handle 401 errors and redirect to login
 apiClient.interceptors.response.use(
   (response) => {
-    // Log successful responses in development
-    if (process.env.NODE_ENV === "development") {
-      console.log(
-        `[API Response] ${response.config.method?.toUpperCase()} ${
-          response.config.url
-        } - ${response.status}`
-      );
-    }
+    // Log successful responses
+    console.log(
+      `[API Response] ${response.config.method?.toUpperCase()} ${
+        response.config.url
+      } - ${response.status}`
+    );
+    console.log(`[API Response] Data:`, response.data);
     return response;
   },
   (error) => {
+    // Detailed error logging
+    console.error("[API Error] Full error object:", error);
+    console.error("[API Error] Response:", error.response);
+    console.error("[API Error] Request:", error.request);
+    console.error("[API Error] Config:", error.config);
+    
     // Handle 401 Unauthorized errors
     if (error.response?.status === 401) {
       console.warn("[API] Unauthorized (401) - Clearing auth and redirecting");
@@ -88,10 +94,11 @@ apiClient.interceptors.response.use(
     // Handle network errors
     if (!error.response) {
       console.error("[API] Network Error - Unable to reach server");
+      console.error("[API] This could be CORS, network connectivity, or server down");
     }
 
-    // Log other errors in development
-    if (process.env.NODE_ENV === "development" && error.response) {
+    // Log all errors with details
+    if (error.response) {
       console.error(
         `[API Error] ${error.config?.method?.toUpperCase()} ${
           error.config?.url
