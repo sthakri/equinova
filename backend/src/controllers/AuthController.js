@@ -179,8 +179,8 @@ const register = asyncHandler(async (req, res) => {
     // Wallet will be created automatically on first transaction if needed
   }
 
-  // Attach JWT token to HTTP-only cookie
-  attachToken(res, { id: user._id, role: user.role, email: user.email });
+  // Attach JWT token to HTTP-only cookie AND return in response body for dual auth support
+  const token = attachToken(res, { id: user._id, role: user.role, email: user.email });
 
   // Log auth success
   const logger = typeof req !== "undefined" && req.log ? req.log : baseLogger;
@@ -189,11 +189,12 @@ const register = asyncHandler(async (req, res) => {
     "Signup successful"
   );
 
-  // Return minimal user info (never password)
+  // Return minimal user info (never password) + token for Bearer auth
   return res.status(201).json({
     success: true,
     message: "Signup successful",
     user: sanitizeUserResponse(user),
+    token: token,
     redirectUrl: `${DASHBOARD_HOME}/`,
   });
 });
@@ -242,18 +243,19 @@ const login = asyncHandler(async (req, res) => {
     });
   }
 
-  // Attach JWT token to HTTP-only cookie
-  attachToken(res, { id: user._id, role: user.role, email: user.email });
+  // Attach JWT token to HTTP-only cookie AND return in response body for dual auth support
+  const token = attachToken(res, { id: user._id, role: user.role, email: user.email });
 
   // Log success
   const logger = typeof req !== "undefined" && req.log ? req.log : baseLogger;
   logger.info({ userId: user._id.toString() }, "Login successful");
 
-  // Return minimal user info (never password)
+  // Return minimal user info (never password) + token for Bearer auth
   return res.json({
     success: true,
     message: "Login successful",
     user: sanitizeUserResponse(user),
+    token: token,
     redirectUrl: `${DASHBOARD_HOME}/`,
   });
 });
@@ -265,7 +267,7 @@ const logout = asyncHandler(async (req, res) => {
   if (isProduction) {
     const clearCookieValue = `${SESSION_COOKIE}=; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=0; Partitioned`;
     res.setHeader("Set-Cookie", clearCookieValue);
-    
+
     return res.json({
       success: true,
       message: "Logged out successfully",

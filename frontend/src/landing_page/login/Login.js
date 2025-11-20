@@ -84,6 +84,12 @@ function Login() {
       });
 
       setSuccess(response.data?.message || "Login successful! Redirecting...");
+      
+      // Store token for dashboard authentication
+      if (response.data?.token) {
+        localStorage.setItem("authToken", response.data.token);
+      }
+      
       setTimeout(() => {
         window.location.href = response.data?.redirectUrl || DASHBOARD_REDIRECT;
       }, 400);

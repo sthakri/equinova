@@ -14,11 +14,14 @@ const apiClient = axios.create({
   timeout: 30000, // 30 second timeout
 });
 
-// Request interceptor - Add any tokens if needed
+// Request interceptor - Add Bearer token from localStorage
 apiClient.interceptors.request.use(
   (config) => {
-    // You can add authorization headers here if using token-based auth
-    // For example: config.headers.Authorization = `Bearer ${token}`;
+    // Add Authorization header with token if available (for cross-site auth)
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
 
     // Log requests in development
     if (process.env.NODE_ENV === "development") {
@@ -53,8 +56,9 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401) {
       console.warn("[API] Unauthorized - Redirecting to login");
 
-      // Clear any local storage if needed
+      // Clear authentication data
       localStorage.removeItem("user");
+      localStorage.removeItem("authToken");
 
       // Store current URL for redirect after login
       const currentPath = window.location.pathname + window.location.search;

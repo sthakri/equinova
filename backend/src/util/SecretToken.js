@@ -52,10 +52,13 @@ function attachToken(res, payload, options = {}) {
     // Express res.cookie() doesn't support Partitioned yet, so we set it manually
     const cookieValue = `${SESSION_COOKIE}=${token}; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=${maxAgeSeconds}; Partitioned`;
     res.setHeader("Set-Cookie", cookieValue);
-    
+
     const logger = require("./logger");
-    logger.info({ partitioned: true, sameSite: "none" }, "Production cookie with Partitioned attribute set");
-    
+    logger.info(
+      { partitioned: true, sameSite: "none" },
+      "Production cookie with Partitioned attribute set"
+    );
+
     return token;
   } else {
     // Development settings (localhost)
