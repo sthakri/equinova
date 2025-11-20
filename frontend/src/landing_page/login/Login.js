@@ -78,30 +78,37 @@ function Login() {
 
     try {
       setIsSubmitting(true);
+
+      console.log("[Login] Submitting to backend...");
       const response = await apiClient.post("/api/auth/login", {
         email: formData.loginEmail.trim(),
         password: formData.loginPassword,
       });
 
+      console.log("[Login] Response received:", response.data);
       setSuccess(response.data?.message || "Login successful! Redirecting...");
-      
+
       // Store token for dashboard authentication
       if (response.data?.token) {
+        console.log("[Login] Storing auth token");
         localStorage.setItem("authToken", response.data.token);
+      } else {
+        console.warn("[Login] No token in response");
       }
-      
+
       setTimeout(() => {
-        window.location.href = response.data?.redirectUrl || DASHBOARD_REDIRECT;
+        const redirectUrl = response.data?.redirectUrl || DASHBOARD_REDIRECT;
+        console.log("[Login] Redirecting to:", redirectUrl);
+        window.location.href = redirectUrl;
       }, 400);
     } catch (err) {
+      console.error("[Login] Error:", err);
       const message =
         err.response?.data?.message ||
         err.message ||
         "Login failed. Please try again.";
-      console.error("Login failed", err);
       setError(message);
-    } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false); // Reset button state on error
     }
   };
 

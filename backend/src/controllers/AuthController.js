@@ -180,7 +180,11 @@ const register = asyncHandler(async (req, res) => {
   }
 
   // Attach JWT token to HTTP-only cookie AND return in response body for dual auth support
-  const token = attachToken(res, { id: user._id, role: user.role, email: user.email });
+  const token = attachToken(res, {
+    id: user._id,
+    role: user.role,
+    email: user.email,
+  });
 
   // Log auth success
   const logger = typeof req !== "undefined" && req.log ? req.log : baseLogger;
@@ -244,7 +248,11 @@ const login = asyncHandler(async (req, res) => {
   }
 
   // Attach JWT token to HTTP-only cookie AND return in response body for dual auth support
-  const token = attachToken(res, { id: user._id, role: user.role, email: user.email });
+  const token = attachToken(res, {
+    id: user._id,
+    role: user.role,
+    email: user.email,
+  });
 
   // Log success
   const logger = typeof req !== "undefined" && req.log ? req.log : baseLogger;

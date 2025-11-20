@@ -12,22 +12,27 @@ const Home = () => {
     const checkAuth = async () => {
       try {
         // Test authentication by calling a protected endpoint
-        await apiClient.get(API_ENDPOINTS.WALLET.BALANCE);
+        const response = await apiClient.get(API_ENDPOINTS.WALLET.BALANCE);
 
         // If successful, user is authenticated
+        console.log("[Auth] Authentication successful", response.status);
         setIsAuthenticated(true);
         setIsChecking(false);
       } catch (error) {
-        // If 401, apiClient interceptor will handle redirect
-        // For other errors, we can try to recover
+        console.error("[Auth] Authentication check failed:", error);
+
+        // Always stop checking, even on error
+        setIsChecking(false);
+        setIsAuthenticated(false);
+
+        // For 401, redirect to login
         if (error.response?.status === 401) {
-          console.log("[Auth] Not authenticated, redirecting to login...");
-          // Interceptor will handle the redirect
-        } else {
-          console.error("[Auth] Error checking authentication:", error);
-          // For network errors or other issues, assume not authenticated
-          setIsAuthenticated(false);
-          setIsChecking(false);
+          console.log(
+            "[Auth] Not authenticated (401), redirecting to login..."
+          );
+
+          // Clear invalid token
+          localStorage.removeItem("authToken");
 
           // Store redirect URL and redirect to login
           const currentPath = window.location.pathname + window.location.search;
@@ -39,7 +44,22 @@ const Home = () => {
 
           const frontendUrl =
             process.env.REACT_APP_FRONTEND_URL || "http://localhost:3001";
-          window.location.href = `${frontendUrl}/login`;
+
+          // Small delay to show error state, then redirect
+          setTimeout(() => {
+            window.location.href = `${frontendUrl}/login`;
+          }, 500);
+        } else {
+          // For network or other errors, also redirect
+          console.error("[Auth] Network or server error, redirecting...");
+          localStorage.removeItem("authToken");
+
+          const frontendUrl =
+            process.env.REACT_APP_FRONTEND_URL || "http://localhost:3001";
+
+          setTimeout(() => {
+            window.location.href = `${frontendUrl}/login`;
+          }, 500);
         }
       }
     };

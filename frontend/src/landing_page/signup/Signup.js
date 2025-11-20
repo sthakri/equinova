@@ -109,32 +109,39 @@ function Signup() {
 
     try {
       setIsSubmitting(true);
+
+      console.log("[Signup] Submitting to backend...");
       const response = await apiClient.post("/api/auth/signup", {
         fullName: formData.username.trim(),
         email: formData.email.trim(),
         password: formData.password,
       });
 
+      console.log("[Signup] Response received:", response.data);
       setSuccess(response.data?.message || "Signup successful! Redirecting...");
 
       // Store token for dashboard authentication
       if (response.data?.token) {
+        console.log("[Signup] Storing auth token");
         localStorage.setItem("authToken", response.data.token);
+      } else {
+        console.warn("[Signup] No token in response");
       }
 
       // Redirect to dashboard
       setTimeout(() => {
-        window.location.href = response.data?.redirectUrl || DASHBOARD_REDIRECT;
+        const redirectUrl = response.data?.redirectUrl || DASHBOARD_REDIRECT;
+        console.log("[Signup] Redirecting to:", redirectUrl);
+        window.location.href = redirectUrl;
       }, 800);
     } catch (err) {
+      console.error("[Signup] Error:", err);
       const message =
         err.response?.data?.message ||
         err.message ||
         "Signup failed. Please try again.";
-      console.error("Signup failed", err);
       setError(message);
-    } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false); // Reset button state on error
     }
   };
 

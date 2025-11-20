@@ -54,24 +54,28 @@ apiClient.interceptors.response.use(
   (error) => {
     // Handle 401 Unauthorized errors
     if (error.response?.status === 401) {
-      console.warn("[API] Unauthorized - Redirecting to login");
+      console.warn("[API] Unauthorized (401) - Clearing auth and redirecting");
 
       // Clear authentication data
       localStorage.removeItem("user");
       localStorage.removeItem("authToken");
 
-      // Store current URL for redirect after login
-      const currentPath = window.location.pathname + window.location.search;
-      const dashboardUrl = window.location.origin;
-      sessionStorage.setItem("redirectAfterLogin", dashboardUrl + currentPath);
-
-      // Get frontend URL from environment
-      const frontendUrl =
-        process.env.REACT_APP_FRONTEND_URL || "http://localhost:3001";
-
-      // Redirect to frontend login page
-      // Check if we're not already being redirected to avoid infinite loops
+      // Avoid infinite redirect loops - check if we're not already on login page
       if (!window.location.href.includes("/login")) {
+        // Store current URL for redirect after login
+        const currentPath = window.location.pathname + window.location.search;
+        const dashboardUrl = window.location.origin;
+        sessionStorage.setItem(
+          "redirectAfterLogin",
+          dashboardUrl + currentPath
+        );
+
+        // Get frontend URL from environment
+        const frontendUrl =
+          process.env.REACT_APP_FRONTEND_URL || "http://localhost:3001";
+
+        // Redirect to frontend login page
+        console.log("[API] Redirecting to:", `${frontendUrl}/login`);
         window.location.href = `${frontendUrl}/login`;
       }
     }
