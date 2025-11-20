@@ -261,24 +261,24 @@ const login = asyncHandler(async (req, res) => {
 const logout = asyncHandler(async (req, res) => {
   const isProduction = process.env.NODE_ENV === "production";
 
-  // Clear cookie with same options used when setting it
+  // In production with Partitioned cookies, we need to clear with the same attributes
+  if (isProduction) {
+    const clearCookieValue = `${SESSION_COOKIE}=; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=0; Partitioned`;
+    res.setHeader("Set-Cookie", clearCookieValue);
+    
+    return res.json({
+      success: true,
+      message: "Logged out successfully",
+    });
+  }
+
+  // Development: use standard cookie clearing
   const clearOptions = {
     httpOnly: true,
     path: "/",
+    secure: false,
+    sameSite: "lax",
   };
-
-  // Match production settings for proper cookie clearing
-  if (isProduction) {
-    const cookieDomain = process.env.COOKIE_DOMAIN;
-    if (cookieDomain) {
-      clearOptions.domain = cookieDomain;
-    }
-    clearOptions.secure = true;
-    clearOptions.sameSite = "none";
-  } else {
-    clearOptions.secure = false;
-    clearOptions.sameSite = "lax";
-  }
 
   res.clearCookie(SESSION_COOKIE, clearOptions);
 

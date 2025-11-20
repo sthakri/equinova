@@ -46,6 +46,17 @@ function attachToken(res, payload, options = {}) {
 
     cookieOptions.secure = true; // Require HTTPS in production
     cookieOptions.sameSite = "none"; // Required for cross-site cookies with secure flag
+
+    // CRITICAL: Add Partitioned attribute for CHIPS (Cookies Having Independent Partitioned State)
+    // This allows cookies to work in third-party contexts in modern browsers (Chrome 118+)
+    // Express res.cookie() doesn't support Partitioned yet, so we set it manually
+    const cookieValue = `${SESSION_COOKIE}=${token}; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=${maxAgeSeconds}; Partitioned`;
+    res.setHeader("Set-Cookie", cookieValue);
+    
+    const logger = require("./logger");
+    logger.info({ partitioned: true, sameSite: "none" }, "Production cookie with Partitioned attribute set");
+    
+    return token;
   } else {
     // Development settings (localhost)
     cookieOptions.secure = false; // Allow HTTP in development

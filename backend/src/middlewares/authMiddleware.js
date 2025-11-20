@@ -8,7 +8,15 @@ async function authenticationGuard(req, res, next) {
       req.headers?.authorization?.replace("Bearer ", "");
 
     if (!token) {
-      req.log?.warn({ path: req.path }, "Authentication required - no token");
+      req.log?.warn(
+        { 
+          path: req.path, 
+          hasCookies: !!req.cookies,
+          cookieNames: req.cookies ? Object.keys(req.cookies) : [],
+          hasAuthHeader: !!req.headers?.authorization 
+        }, 
+        "Authentication required - no token"
+      );
       return res.status(401).json({ message: "Authentication required" });
     }
 
