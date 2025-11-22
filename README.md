@@ -10,15 +10,18 @@ All tests pass, security is configured, and the codebase is ready for deployment
 
 ## Overview
 
-- Full-featured virtual trading experience: register/login, buy/sell orders, holdings, wallet/funds, order history, charts.
-- Realistic market flow backed by a market data service and clean service boundaries.
-- Clean separation between public site (`frontend`) and app (`dashboard`).
+- Virtual trading platform with register/login, buy/sell orders, real-time holdings tracking, wallet/funds management, and order history
+- Live WebSocket price updates for 60+ US stock symbols
+- Simulated market data with random-walk price algorithm
+- $100,000 starting virtual balance for paper trading
 
 ## Tech Stack (MERN)
 
-- Backend: Node.js, Express, MongoDB, Mongoose, JWT, bcrypt, Helmet, express-rate-limit, CORS, dotenv, pino
-- Web Apps: React 19, React Router DOM, Axios, MUI (dashboard), Chart.js (dashboard)
-- Tooling/Tests: Jest, React Testing Library, supertest, nodemon, CRA (react-scripts)
+- Backend: Node.js, Express, MongoDB, Mongoose, JWT, bcrypt, Helmet, express-rate-limit, CORS, Socket.IO, pino
+- Dashboard: React 19, React Router, Axios, MUI, Chart.js, Socket.IO client
+- Frontend: React 19, React Router, Axios
+- Testing: Jest, React Testing Library, supertest
+- Dev Tools: nodemon, Create React App
 
 ## Folder Structure
 
@@ -48,8 +51,8 @@ Backend (`backend/.env`):
 - `MONGO_URL` (required): MongoDB URI
 - `JWT_SECRET` (required): strong secret for tokens
 - `PORT` (optional, default 3002)
-- `FRONTEND_URL` (dev default http://localhost:3001)
-- `DASHBOARD_URL` (dev default http://localhost:3000)
+- `FRONTEND_URL` (dev default http://localhost:3000)
+- `DASHBOARD_URL` (dev default http://localhost:3001)
 - `CORS_ORIGINS` (optional, comma-separated)
 - `LOG_LEVEL` (optional, default info)
 - `PRICE_UPDATE_INTERVAL_MS` (optional, e.g., 60000)
@@ -58,7 +61,7 @@ Backend (`backend/.env`):
 Dashboard (`dashboard/.env`):
 
 - `REACT_APP_API_BASE_URL` (e.g., http://localhost:3002)
-- `REACT_APP_WS_URL` (if used; e.g., ws://localhost:3002)
+- `REACT_APP_WS_URL` (e.g., http://localhost:3002 for WebSocket)
 - `REACT_APP_FRONTEND_URL` (optional, used in redirects if needed)
 
 Frontend (`frontend/.env`):
@@ -76,16 +79,16 @@ Backend (port 3002):
 cd backend; npm run dev
 ```
 
-Dashboard (port 3000):
-
-```powershell
-cd dashboard; npm run dev
-```
-
-Frontend (port 3001):
+Frontend (port 3000):
 
 ```powershell
 cd frontend; npm run dev
+```
+
+Dashboard (port 3001):
+
+```powershell
+cd dashboard; npm run dev
 ```
 
 ## Useful Scripts

@@ -8,7 +8,7 @@
  */
 export const redirectToFrontend = () => {
   const frontendUrl =
-    process.env.REACT_APP_FRONTEND_URL || "http://localhost:3000";
+    process.env.REACT_APP_FRONTEND_URL || "http://localhost:3001";
   window.location.href = frontendUrl;
 };
 
