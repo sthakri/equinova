@@ -143,7 +143,6 @@ Post-Deploy Checklist:
 
 ## Notes
 
-- Do not use `.env.example`; maintain only real `.env` files locally and set env vars in hosting dashboards.
 - `.gitignore` already excludes `.env`, `node_modules`, build outputs.
 
 ## License
