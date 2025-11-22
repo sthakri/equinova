@@ -7,24 +7,24 @@ function Hero() {
         <div className="col-lg-6 position-relative">
           <span className="data-pill hero-pill">
             <span className="hero-pill-dot"></span>
-            Live market simulation
+            Simulated market feed
           </span>
           <h1 className="display-5 fw-semibold mb-3">
-            Trade Smarter.
+            Practice Trading.
             <br />
-            Evolve Faster.
+            Build Core Skills.
           </h1>
           <p className="lead text-muted mb-4">
-            EquiNova combines live market data and interactive dashboards to
-            help you simulate trades, track portfolios, and grow your market
-            intuition through guided practice sessions.
+            A focused environment for learning order flow and portfolio impact
+            using virtual funds and a controlled price simulation—without
+            over‑promising features that aren’t shipped yet.
           </p>
           <div className="d-flex flex-wrap gap-3">
             <a href="/signup" className="btn btn-primary btn-lg px-4">
               Get Started
             </a>
             <a href="/product" className="btn btn-outline-primary btn-lg px-4">
-              Explore Dashboard
+              View Components
             </a>
           </div>
           <div className="d-flex flex-column flex-sm-row gap-3 mt-4">
@@ -32,21 +32,21 @@ function Hero() {
               <span
                 className="hero-feature-icon"
                 role="img"
-                aria-label="analytics"
+                aria-label="prices"
               >
-                📈
+                💹
               </span>
-              Real-time performance analytics
+              Price updates ~3s
             </div>
             <div className="hero-feature">
               <span
                 className="hero-feature-icon"
                 role="img"
-                aria-label="learning"
+                aria-label="wallet"
               >
-                🎓
+                💼
               </span>
-              Learn trading by doing
+              Virtual $100k balance
             </div>
           </div>
         </div>
@@ -55,39 +55,39 @@ function Hero() {
             <div className="hero-card-grid">
               <div className="hero-card hero-card-main">
                 <div className="d-flex justify-content-between align-items-center mb-2">
-                  <span className="hero-chip">Portfolio pulse</span>
-                  <span className="hero-chip hero-chip-success">+4.8%</span>
+                  <span className="hero-chip">Sample balance</span>
+                  <span className="hero-chip hero-chip-success">Demo</span>
                 </div>
-                <h3 className="hero-metric">$12,480</h3>
+                <h3 className="hero-metric">$100,000</h3>
                 <p className="text-muted small mb-0">
-                  Practice balance across five simulated positions.
+                  Initial virtual funds on signup.
                 </p>
               </div>
               <div className="hero-card hero-card-watch">
                 <div className="d-flex justify-content-between align-items-center mb-3">
-                  <span className="hero-chip">Market watch</span>
+                  <span className="hero-chip">Watchlist (sample)</span>
                   <span className="hero-chip hero-chip-muted">Live</span>
                 </div>
                 <ul className="hero-card-list">
                   <li>
                     <span>TSLA</span>
-                    <span className="text-success">+1.6%</span>
+                    <span className="text-muted">price → updates</span>
                   </li>
                   <li>
                     <span>NVDA</span>
-                    <span className="text-success">+0.9%</span>
+                    <span className="text-muted">price → updates</span>
                   </li>
                   <li>
-                    <span>ETH</span>
-                    <span className="text-danger">-0.7%</span>
+                    <span>AAPL</span>
+                    <span className="text-muted">price → updates</span>
                   </li>
                 </ul>
               </div>
               <div className="hero-card hero-card-progress">
-                <span className="hero-chip mb-2">Next milestone</span>
-                <h6 className="mb-1">Execute 3 simulated orders</h6>
+                <span className="hero-chip mb-2">Planned</span>
+                <h6 className="mb-1">Chart overlays & notes</h6>
                 <p className="text-muted small mb-0">
-                  Unlock advanced chart overlays once you complete this sprint.
+                  Not implemented yet—foundation first, tooling later.
                 </p>
               </div>
             </div>

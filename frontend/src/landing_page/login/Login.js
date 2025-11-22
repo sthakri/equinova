@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import apiClient from "../../utils/apiClient";
 
-const reassurance = [
-  "Biometric-ready sessions",
-  "Secure device approvals",
-  "Live session status",
+// Implemented, factual features (used for checklist display)
+const implementedFeatures = [
+  "Secure email/password authentication",
+  "Initial virtual wallet balance ($100k)",
+  "Random-walk price simulation (~3s updates)",
+  "Paper BUY/SELL order tracking",
 ];
 
 const DASHBOARD_REDIRECT =
@@ -39,9 +41,8 @@ function Login() {
 
   const handleForgotPassword = (event) => {
     event.preventDefault();
-    // Placeholder for forgot password functionality
     alert(
-      "Forgot Password feature coming soon! Please contact support for password reset assistance."
+      "Password reset flow not implemented yet. Please contact support if you need assistance."
     );
   };
 
@@ -94,9 +95,11 @@ function Login() {
         console.log("[Login] Token received, redirecting to dashboard...");
         const redirectUrl = response.data?.redirectUrl || DASHBOARD_REDIRECT;
         // Pass token as URL parameter for cross-domain authentication
-        const dashboardUrl = `${redirectUrl}?token=${encodeURIComponent(token)}`;
+        const dashboardUrl = `${redirectUrl}?token=${encodeURIComponent(
+          token
+        )}`;
         console.log("[Login] Redirecting to:", dashboardUrl);
-        
+
         setTimeout(() => {
           window.location.href = dashboardUrl;
         }, 400);
@@ -123,9 +126,9 @@ function Login() {
           <div className="col-lg-5 order-lg-2">
             <div className="auth-card">
               <div className="auth-card-header">
-                <span>Welcome back</span>
+                <span>Account Access</span>
                 <h2>Log in to EquiNova</h2>
-                <p>Pick up where you left off in your trading sprint.</p>
+                <p>Continue practicing with your virtual wallet and trades.</p>
               </div>
               <form className="auth-form" onSubmit={handleSubmit}>
                 <label htmlFor="loginEmail">Email address</label>
@@ -197,29 +200,24 @@ function Login() {
             </div>
           </div>
           <div className="col-lg-6 order-lg-1">
-            <span className="data-pill auth-badge">Secure cloud trading</span>
+            <span className="data-pill auth-badge">Sandbox login</span>
             <h1 className="display-5 fw-semibold mt-3 mb-4">
-              Continue your guided practice with real-time market sync.
+              Access your virtual balance and paper trades.
             </h1>
             <p className="lead text-muted mb-4">
-              EquiNova remembers your open simulations, portfolio notes, and
-              coaching cues so you can resume every sprint without context
-              switching.
+              On login the dashboard loads your wallet balance, recorded
+              transactions, and current simulated prices. No biometric, device
+              approval, or coaching layers are implemented yet.
             </p>
             <div className="auth-activity-feed">
               <div className="auth-activity-card">
-                <span className="hero-chip">Session status</span>
-                <strong>Macro Momentum</strong>
-                <p className="mb-0">Paused · 12m ago · Risk score 24</p>
-              </div>
-              <div className="auth-activity-card">
-                <span className="hero-chip hero-chip-success">Watchlist</span>
-                <strong>Energy rotation</strong>
-                <p className="mb-0">3 opportunities flagged overnight</p>
+                <span className="hero-chip hero-chip-muted">Implemented</span>
+                <strong>Core modules active</strong>
+                <p className="mb-0">Auth, wallet, orders, price feed</p>
               </div>
             </div>
             <ul className="auth-checklist mt-4">
-              {reassurance.map((item) => (
+              {implementedFeatures.map((item) => (
                 <li key={item}>
                   <span className="auth-check-icon" aria-hidden="true">
                     ✔
@@ -227,7 +225,7 @@ function Login() {
                   <div>
                     <strong>{item}</strong>
                     <p className="mb-0 text-muted">
-                      Part of the EquiNova secure sign-in flow
+                      Factual, currently available
                     </p>
                   </div>
                 </li>

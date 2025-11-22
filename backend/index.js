@@ -285,15 +285,6 @@ app.get("/allHoldings", authenticationGuard, async (req, res) => {
   }
 });
 
-//   tempHoldings.forEach((item) => {
-//     let newHolding = new HoldingsModel({
-//     newHolding.save();
-
-//   tempPositions.forEach((item) => {
-//     let newPosition = new PositionsModel({
-
-//     newPosition.save();
-
 // Get specific holding by symbol for authenticated user
 app.get("/holdings/:symbol", authenticationGuard, async (req, res) => {
   try {

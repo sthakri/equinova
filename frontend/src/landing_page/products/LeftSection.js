@@ -4,8 +4,6 @@ function LeftSection({
   imageURL,
   productName,
   productDesription,
-  tryDemo,
-  learnMore,
   googlePlay,
   appStore,
 }) {
@@ -20,18 +18,7 @@ function LeftSection({
         <div className="col-lg-6 p-lg-5">
           <h2 className="section-heading mb-3">{productName}</h2>
           <p>{productDesription}</p>
-          <div className="d-flex flex-wrap gap-4 align-items-center">
-            {tryDemo && (
-              <a href={tryDemo} className="equinova-anchor">
-                Try Demo
-              </a>
-            )}
-            {learnMore && (
-              <a href={learnMore} className="equinova-anchor">
-                Learn More
-              </a>
-            )}
-          </div>
+          {/* Demo and Learn More links removed as requested */}
           {(googlePlay || appStore) && (
             <div className="mt-3 d-flex flex-wrap gap-4">
               {googlePlay && (

@@ -38,13 +38,3 @@ export const API_ENDPOINTS = {
   ORDERS: `${API_BASE_URL}/allOrders`,
   NEW_ORDER: `${API_BASE_URL}/newOrder`,
 };
-
-// Axios configuration with credentials
-export const axiosConfig = {
-  withCredentials: true,
-  headers: {
-    "Content-Type": "application/json",
-  },
-};
-
-export default API_BASE_URL;

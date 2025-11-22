@@ -2,18 +2,19 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import apiClient from "../../utils/apiClient";
 
-const growthHighlights = [
+const implementedFeatures = [
   {
-    title: "Free practice portfolio",
-    detail: "Start with $25,000 virtual cash to explore advanced order types.",
+    title: "Virtual starting balance",
+    detail: "$100,000 simulated funds—adjust wallet via paper BUY/SELL orders.",
   },
   {
-    title: "Adaptive lessons",
-    detail: "Progressive curriculum that unlocks new modules as you grow.",
+    title: "Simulated price updates",
+    detail:
+      "Random-walk symbol prices refresh every ~3 seconds for practice timing.",
   },
   {
-    title: "Session replays",
-    detail: "Review every trade with annotated charts and coaching cues.",
+    title: "Transaction history",
+    detail: "View all paper orders and balance changes in a simple log.",
   },
 ];
 
@@ -126,9 +127,11 @@ function Signup() {
         console.log("[Signup] Token received, redirecting to dashboard...");
         const redirectUrl = response.data?.redirectUrl || DASHBOARD_REDIRECT;
         // Pass token as URL parameter for cross-domain authentication
-        const dashboardUrl = `${redirectUrl}?token=${encodeURIComponent(token)}`;
+        const dashboardUrl = `${redirectUrl}?token=${encodeURIComponent(
+          token
+        )}`;
         console.log("[Signup] Redirecting to:", dashboardUrl);
-        
+
         setTimeout(() => {
           window.location.href = dashboardUrl;
         }, 800);
@@ -153,35 +156,34 @@ function Signup() {
       <div className="container py-5">
         <div className="row align-items-center g-5">
           <div className="col-lg-6">
-            <span className="data-pill auth-badge">
-              Guided onboarding · 3 steps
-            </span>
+            <span className="data-pill auth-badge">Signup access</span>
             <h1 className="display-5 fw-semibold mt-3 mb-4">
-              Create your EquiNova workspace.
+              Create a sandbox account.
             </h1>
             <p className="lead text-muted mb-4">
-              Build a resilient trading routine with curated simulations,
-              collaborative notes, and advanced watchlists designed for modern
-              retail investors.
+              Signup initializes a wallet with a $100,000 virtual balance,
+              grants access to the simulated price feed, and allows you to
+              record paper trades. No community layer, adaptive lessons, or
+              advanced watchlist features are implemented yet.
             </p>
             <div className="row g-3">
               <div className="col-6">
                 <div className="auth-metric-card">
-                  <small>Avg. practice ROI</small>
-                  <strong>+5.2%</strong>
-                  <span>after 6 guided sessions</span>
+                  <small>Starting balance</small>
+                  <strong>$100k</strong>
+                  <span>virtual funds</span>
                 </div>
               </div>
               <div className="col-6">
                 <div className="auth-metric-card">
-                  <small>Community</small>
-                  <strong>14k+</strong>
-                  <span>peer strategists</span>
+                  <small>Price updates</small>
+                  <strong>~3s</strong>
+                  <span>refresh interval</span>
                 </div>
               </div>
             </div>
             <ul className="auth-checklist mt-4">
-              {growthHighlights.map((item) => (
+              {implementedFeatures.map((item) => (
                 <li key={item.title}>
                   <span className="auth-check-icon" aria-hidden="true">
                     ✔
@@ -197,9 +199,9 @@ function Signup() {
           <div className="col-lg-5 ms-lg-auto">
             <div className="auth-card">
               <div className="auth-card-header">
-                <span>Step 1</span>
+                <span>Account signup</span>
                 <h2>Create your account</h2>
-                <p>We will keep your details safe and private.</p>
+                <p>Secure storage with bcrypt password hashing.</p>
               </div>
               <form className="auth-form" onSubmit={handleSubmit}>
                 <label htmlFor="email">Email address</label>

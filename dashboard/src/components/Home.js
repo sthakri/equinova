@@ -14,18 +14,24 @@ const Home = () => {
       try {
         // First, check if token is in URL (from login/signup redirect)
         const urlParams = new URLSearchParams(window.location.search);
-        const urlToken = urlParams.get('token');
-        
+        const urlToken = urlParams.get("token");
+
         if (urlToken) {
           console.log("[Auth] Token found in URL, storing it...");
           localStorage.setItem("authToken", urlToken);
           // Clean up URL by removing token parameter
-          window.history.replaceState({}, document.title, window.location.pathname);
+          window.history.replaceState(
+            {},
+            document.title,
+            window.location.pathname
+          );
         }
-        
+
         // Now get token from localStorage
         const token = localStorage.getItem("authToken");
-        const tokenDebug = token ? `Token present (${token.substring(0, 20)}...)` : "NO TOKEN FOUND";
+        const tokenDebug = token
+          ? `Token present (${token.substring(0, 20)}...)`
+          : "NO TOKEN FOUND";
         console.log("[Auth Debug]", tokenDebug);
         setDebugInfo(`Step 1: ${tokenDebug}\n`);
 
@@ -35,30 +41,34 @@ const Home = () => {
 
         // Test authentication by calling a protected endpoint
         console.log("[Auth] Calling wallet balance endpoint...");
-        setDebugInfo(prev => prev + "Step 2: Calling /api/wallet/balance...\n");
-        
+        setDebugInfo(
+          (prev) => prev + "Step 2: Calling /api/wallet/balance...\n"
+        );
+
         const response = await apiClient.get(API_ENDPOINTS.WALLET.BALANCE);
 
         // If successful, user is authenticated
         console.log("[Auth] Authentication successful", response.status);
-        setDebugInfo(prev => prev + `Step 3: Success! Status ${response.status}\n`);
+        setDebugInfo(
+          (prev) => prev + `Step 3: Success! Status ${response.status}\n`
+        );
         setIsAuthenticated(true);
         setIsChecking(false);
       } catch (error) {
         console.error("[Auth] Authentication check failed:", error);
-        
+
         // Capture detailed error info
         const errorDetails = {
           message: error.message,
           status: error.response?.status,
           statusText: error.response?.statusText,
           data: error.response?.data,
-          hasToken: !!localStorage.getItem("authToken")
+          hasToken: !!localStorage.getItem("authToken"),
         };
-        
+
         const debugText = `ERROR:\n${JSON.stringify(errorDetails, null, 2)}`;
         console.error("[Auth Debug]", debugText);
-        setDebugInfo(prev => prev + debugText);
+        setDebugInfo((prev) => prev + debugText);
 
         // Store error in localStorage for persistence
         localStorage.setItem("lastAuthError", debugText);
@@ -66,49 +76,6 @@ const Home = () => {
         // Always stop checking, even on error
         setIsChecking(false);
         setIsAuthenticated(false);
-
-        // Don't redirect immediately - show error for debugging
-        // User can refresh or manually navigate if needed
-        return;
-        
-        /* DISABLED AUTO-REDIRECT FOR DEBUGGING
-        // For 401, redirect to login
-        if (error.response?.status === 401) {
-          console.log(
-            "[Auth] Not authenticated (401), redirecting to login..."
-          );
-
-          // Clear invalid token
-          localStorage.removeItem("authToken");
-
-          // Store redirect URL and redirect to login
-          const currentPath = window.location.pathname + window.location.search;
-          const dashboardUrl = window.location.origin;
-          sessionStorage.setItem(
-            "redirectAfterLogin",
-            dashboardUrl + currentPath
-          );
-
-          const frontendUrl =
-            process.env.REACT_APP_FRONTEND_URL || "http://localhost:3001";
-
-          // Small delay to show error state, then redirect
-          setTimeout(() => {
-            window.location.href = `${frontendUrl}/login`;
-          }, 500);
-        } else {
-          // For network or other errors, also redirect
-          console.error("[Auth] Network or server error, redirecting...");
-          localStorage.removeItem("authToken");
-
-          const frontendUrl =
-            process.env.REACT_APP_FRONTEND_URL || "http://localhost:3001";
-
-          setTimeout(() => {
-            window.location.href = `${frontendUrl}/login`;
-          }, 500);
-        }
-        */
       }
     };
 
@@ -171,32 +138,41 @@ const Home = () => {
           color: "#d4d4d4",
         }}
       >
-        <div style={{ 
-          maxWidth: "800px", 
-          width: "100%",
-          backgroundColor: "#252526",
-          padding: "20px",
-          borderRadius: "8px",
-          border: "1px solid #3e3e42"
-        }}>
-          <h2 style={{ color: "#f48771", marginTop: 0 }}>Authentication Failed</h2>
-          <pre style={{ 
-            whiteSpace: "pre-wrap", 
-            wordBreak: "break-word",
-            backgroundColor: "#1e1e1e",
-            padding: "15px",
-            borderRadius: "4px",
-            overflow: "auto",
-            maxHeight: "60vh"
-          }}>
-            {debugInfo || localStorage.getItem("lastAuthError") || "No debug info available"}
+        <div
+          style={{
+            maxWidth: "800px",
+            width: "100%",
+            backgroundColor: "#252526",
+            padding: "20px",
+            borderRadius: "8px",
+            border: "1px solid #3e3e42",
+          }}
+        >
+          <h2 style={{ color: "#f48771", marginTop: 0 }}>
+            Authentication Failed
+          </h2>
+          <pre
+            style={{
+              whiteSpace: "pre-wrap",
+              wordBreak: "break-word",
+              backgroundColor: "#1e1e1e",
+              padding: "15px",
+              borderRadius: "4px",
+              overflow: "auto",
+              maxHeight: "60vh",
+            }}
+          >
+            {debugInfo ||
+              localStorage.getItem("lastAuthError") ||
+              "No debug info available"}
           </pre>
           <div style={{ marginTop: "20px" }}>
             <button
               onClick={() => {
                 localStorage.removeItem("authToken");
                 localStorage.removeItem("lastAuthError");
-                const frontendUrl = process.env.REACT_APP_FRONTEND_URL || "http://localhost:3001";
+                const frontendUrl =
+                  process.env.REACT_APP_FRONTEND_URL || "http://localhost:3001";
                 window.location.href = `${frontendUrl}/login`;
               }}
               style={{
@@ -206,7 +182,7 @@ const Home = () => {
                 color: "white",
                 border: "none",
                 borderRadius: "4px",
-                cursor: "pointer"
+                cursor: "pointer",
               }}
             >
               Go to Login
@@ -219,7 +195,7 @@ const Home = () => {
                 color: "white",
                 border: "none",
                 borderRadius: "4px",
-                cursor: "pointer"
+                cursor: "pointer",
               }}
             >
               Retry

@@ -4,10 +4,10 @@ function Stats() {
   return (
     <div className="container py-5">
       <div className="text-center mb-5">
-        <h2 className="section-heading mb-3">How EquiNova Works</h2>
+        <h2 className="section-heading mb-3">Core Usage Flow</h2>
         <p className="section-subtitle mx-auto">
-          A streamlined flow helps new traders get from sign-up to meaningful
-          insights without friction.
+          The current implementation focuses on essential mechanics. Each step
+          below maps directly to shipped functionality—no filler.
         </p>
       </div>
       <div className="row g-4">
@@ -16,11 +16,8 @@ function Stats() {
             <div className="process-icon">
               <i className="fa-solid fa-user-plus"></i>
             </div>
-            <h5>Create an account</h5>
-            <p>
-              Sign up with secure authentication to keep every device in sync
-              from day one.
-            </p>
+            <h5>Sign up</h5>
+            <p>Create an account and receive a virtual starting balance.</p>
           </div>
         </div>
         <div className="col-md-6 col-lg-3">
@@ -28,35 +25,26 @@ function Stats() {
             <div className="process-icon">
               <i className="fa-solid fa-chart-line"></i>
             </div>
-            <h5>Track live stocks</h5>
-            <p>
-              Stream curated watchlists and see price action update in real time
-              as you learn.
-            </p>
+            <h5>Watch prices</h5>
+            <p>Observe simulated symbol updates every few seconds.</p>
           </div>
         </div>
         <div className="col-md-6 col-lg-3">
           <div className="process-card h-100">
             <div className="process-icon">
-              <i className="fa-solid fa-exchange-alt"></i>
+              <i className="fa-solid fa-right-left"></i>
             </div>
-            <h5>Trade with virtual cash</h5>
-            <p>
-              Place simulated buy and sell orders to test your ideas without
-              risking capital.
-            </p>
+            <h5>Place orders</h5>
+            <p>Execute paper BUY/SELL and see wallet balance adjust.</p>
           </div>
         </div>
         <div className="col-md-6 col-lg-3">
           <div className="process-card h-100">
             <div className="process-icon">
-              <i className="fa-solid fa-chart-pie"></i>
+              <i className="fa-solid fa-list"></i>
             </div>
-            <h5>Analyze portfolio performance</h5>
-            <p>
-              Review holdings and charts that surface trends, strengths, and
-              focus areas fast.
-            </p>
+            <h5>Review records</h5>
+            <p>Check holdings & transaction history for outcome tracking.</p>
           </div>
         </div>
       </div>

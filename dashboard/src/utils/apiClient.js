@@ -21,20 +21,11 @@ apiClient.interceptors.request.use(
     const token = localStorage.getItem("authToken");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      console.log(`[API Request] Added Authorization header to ${config.url}`);
-      console.log(`[API Request] Token: ${token.substring(0, 20)}...`);
-    } else {
-      console.warn(`[API Request] NO TOKEN FOUND for ${config.url}`);
     }
-
-    // Log full request details
-    console.log(`[API Request] ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`);
-    console.log(`[API Request] Headers:`, config.headers);
 
     return config;
   },
   (error) => {
-    console.error("[API Request Error]", error);
     return Promise.reject(error);
   }
 );
@@ -42,26 +33,11 @@ apiClient.interceptors.request.use(
 // Response interceptor - Handle 401 errors and redirect to login
 apiClient.interceptors.response.use(
   (response) => {
-    // Log successful responses
-    console.log(
-      `[API Response] ${response.config.method?.toUpperCase()} ${
-        response.config.url
-      } - ${response.status}`
-    );
-    console.log(`[API Response] Data:`, response.data);
     return response;
   },
   (error) => {
-    // Detailed error logging
-    console.error("[API Error] Full error object:", error);
-    console.error("[API Error] Response:", error.response);
-    console.error("[API Error] Request:", error.request);
-    console.error("[API Error] Config:", error.config);
-    
     // Handle 401 Unauthorized errors
     if (error.response?.status === 401) {
-      console.warn("[API] Unauthorized (401) - Clearing auth and redirecting");
-
       // Clear authentication data
       localStorage.removeItem("user");
       localStorage.removeItem("authToken");
@@ -81,30 +57,8 @@ apiClient.interceptors.response.use(
           process.env.REACT_APP_FRONTEND_URL || "http://localhost:3001";
 
         // Redirect to frontend login page
-        console.log("[API] Redirecting to:", `${frontendUrl}/login`);
         window.location.href = `${frontendUrl}/login`;
       }
-    }
-
-    // Handle 403 Forbidden errors
-    if (error.response?.status === 403) {
-      console.error("[API] Forbidden - Access denied");
-    }
-
-    // Handle network errors
-    if (!error.response) {
-      console.error("[API] Network Error - Unable to reach server");
-      console.error("[API] This could be CORS, network connectivity, or server down");
-    }
-
-    // Log all errors with details
-    if (error.response) {
-      console.error(
-        `[API Error] ${error.config?.method?.toUpperCase()} ${
-          error.config?.url
-        } - ${error.response.status}`,
-        error.response.data
-      );
     }
 
     return Promise.reject(error);
